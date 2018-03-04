@@ -30,33 +30,52 @@
                         </template>
                     </v-toolbar>
                     <v-divider></v-divider>
-                    <v-list subheader>
-                        <v-subheader inset>
-                            <div>Item(s)</div>
-                            <v-spacer></v-spacer>
-                            <div>Balance</div>
-                        </v-subheader>
-                        <v-divider inset></v-divider>
-                        <v-list-tile v-for="item in filteredItems"
-                                     :key="item.code"
-                                     avatar
-                                     ripple
-                                     @click="select(item.id)">
-                            <v-list-tile-avatar>
-                                <v-avatar size="34px"
-                                          :class="getAvatarClass(item.color)">
-                                    <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
-                                </v-avatar>
-                            </v-list-tile-avatar>
-                            <v-list-tile-content>
-                                <v-list-tile-title class="body-1">
-                                    {{ item.code }} - {{ item.description}}
-                                </v-list-tile-title>
-                            </v-list-tile-content>
-                            <v-list-tile-action>
-                                {{ item.balance }}
-                            </v-list-tile-action>
-                        </v-list-tile>
+                    <v-list>
+                        <v-list-group v-model="category.active"
+                                      v-for="category in filteredItems"
+                                      :key="category.description"
+                                      class="inventory_list_group">
+                            <!-- :prepend-icon="item.action" -->
+                            <!-- <v-subheader inset>
+                                <div>Item(s)</div>
+                                <v-spacer></v-spacer>
+                                <div>Balance</div>
+                            </v-subheader> -->
+                            <!-- <v-divider inset></v-divider> -->
+                            <v-list-tile slot="activator">
+                                <v-list-tile-content>
+                                    <v-list-tile-title>
+                                        {{ category.description }}
+
+                                    </v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-list-tile-action>
+                                    <v-chip small
+                                            disabled>{{ category.items.length || 0 }}</v-chip>
+                                </v-list-tile-action>
+                            </v-list-tile>
+                            <v-list-tile v-for="item in category.items"
+                                         :key="item.code"
+                                         avatar
+                                         ripple
+                                         @click="select(item.id)">
+                                <v-list-tile-avatar>
+                                    <v-avatar size="34px"
+                                              :class="getAvatarClass(item.color)">
+                                        <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
+                                    </v-avatar>
+                                </v-list-tile-avatar>
+                                <v-list-tile-content>
+                                    <v-list-tile-title class="body-1">
+                                        {{ item.code }} - {{ item.description}}
+                                    </v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-list-tile-action>
+                                    {{ item.balance }}
+                                </v-list-tile-action>
+                            </v-list-tile>
+
+                        </v-list-group>
                     </v-list>
                 </v-card>
                 <transition name="slide-x-transition"
@@ -84,7 +103,7 @@ export default {
     data() {
         return {
             searchKey: null,
-            items: [],
+            list: [],
             isShow2ndLevel: false, // for computed,
             isAddNew: false
         }
@@ -93,10 +112,10 @@ export default {
         filteredItems() {
             let vm = this
             if (!vm.searchKey) {
-                return vm.items
+                return vm.list
             }
 
-            return vm.items.filter(obj_item => {
+            return vm.list.filter(obj_item => {
                 return (
                     vm.isStringContain(obj_item.code, vm.searchKey) || vm.isStringContain(obj_item.code, vm.searchKey)
                 )
@@ -139,7 +158,7 @@ export default {
                 MockData = require('./../data.js')
 
             MockData.getInventory().then(obj_response => {
-                this.items = obj_response
+                vm.list = obj_response
             })
         },
         close() {
@@ -187,5 +206,7 @@ export default {
 </script>
 
 <style>
-
+.inventory_list_group .list__group__header .list__tile {
+    padding-right: 0;
+}
 </style>
