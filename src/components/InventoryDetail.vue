@@ -5,7 +5,7 @@
             style="position:relative;">
         <v-card tile
                 height="100%"
-                style="z-index:6;">
+                style="z-index:6; overflow:hidden;">
             <v-toolbar color="grey lighten-4"
                        flat
                        prominent
