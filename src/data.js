@@ -1,22 +1,36 @@
 import moment from 'moment'
 import _ from 'lodash'
 
-let items = [
+let categories = [
+
+
+]
+
+let list = [
   {
-    value: false,
-    id: '0001',
-    code: 'VIB 01',
-    description: 'Vibration',
-    color: 'Pink',
-    balance: 24
+    active: false,
+    description: 'Toys',
+    items: [{
+      value: false,
+      id: '0001',
+      code: 'VIB 01',
+      description: 'Vibration',
+      color: 'Pink',
+      balance: 24
+    }]
   },
   {
-    value: false,
-    id: '0002',
-    code: 'Bra No.4',
-    description: 'Sporty Bra-Limited Edition',
-    color: 'White',
-    balance: 24
+    active: false,
+    description: 'Bras',
+    items: [{
+      categories: 'Bras',
+      value: false,
+      id: '0002',
+      code: 'Bra No.4',
+      description: 'Sporty Bra-Limited Edition',
+      color: 'White',
+      balance: 24
+    }]
   }
 ]
 
@@ -233,16 +247,16 @@ let itemDetails = [
 
 export let getInventory = () =>
   new Promise(resolve => {
-    items = _.sortBy(items, obj_item => {
+    list = _.sortBy(list, obj_item => {
       return obj_item.description
     })
-    resolve(items)
+    resolve(list)
   })
 
 export let getInventoryById = str_id =>
   new Promise(resolve => {
     resolve(
-      items.find(obj_item => {
+      list.find(obj_item => {
         return obj_item.id == str_id
       })
     )
@@ -250,8 +264,8 @@ export let getInventoryById = str_id =>
 
 export let addNewItem = obj_item =>
   new Promise(resolve => {
-    items.push(obj_item)
-    resolve(items)
+    list.push(obj_item)
+    resolve(list)
   })
 
 export let getInventoryDetailById = str_id =>
