@@ -255,11 +255,23 @@ export let getInventory = () =>
 
 export let getInventoryById = str_id =>
   new Promise(resolve => {
-    resolve(
-      list.find(obj_item => {
+    let obj_result = null;
+    _.forEach(list, (category) => {
+      if (!category.items) {
+        return
+      }
+
+
+      obj_result = category.items.find(obj_item => {
         return obj_item.id == str_id
       })
-    )
+
+      if (obj_result) {
+        return false
+      }
+    })
+    debugger
+    resolve(obj_result)
   })
 
 export let addNewItem = obj_item =>
