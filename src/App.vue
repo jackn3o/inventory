@@ -4,8 +4,8 @@
              :class="appClasses">
             <v-layout row
                       fill-height>
-                <v-flex lg10
-                        offset-lg1
+                <v-flex xl10
+                        offset-xl1
                         xs12>
                     <router-view></router-view>
                 </v-flex>
@@ -28,14 +28,7 @@ export default {
         },
         appClasses() {
             return {
-                'pt-3':
-                    this.currentViewportSize !== 'xs' &&
-                    this.currentViewportSize !== 'sm' &&
-                    this.currentViewportSize !== 'md',
-                'pb-3':
-                    this.currentViewportSize !== 'xs' &&
-                    this.currentViewportSize !== 'sm' &&
-                    this.currentViewportSize !== 'md'
+                'py-3': this.currentViewportSize === 'xl'
             }
         }
     },
