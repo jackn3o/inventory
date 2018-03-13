@@ -40,156 +40,180 @@ let itemDetails = [
     batchNo: 'B001',
     documentNo: '12345',
     date: moment('1/4/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: 100,
     out: null,
     unitCost: 2.0,
     balanceQuantity: 100,
     totalCost: 200.0,
     totalSales: null,
-    balanceCost: 200.0
+    balanceCost: 200.0,
+    remark: 'this is a remark'
   },
   {
     itemId: '0001',
     batchNo: 'B003',
     documentNo: '12346',
     date: moment('3/5/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: 50,
     out: null,
     unitCost: 2.1,
     balanceQuantity: 130,
     totalCost: 105.0,
     totalSales: null,
-    balanceCost: 265.0
+    balanceCost: 265.0,
+    remark: null
   },
   {
     itemId: '0001',
     batchNo: 'B005',
     documentNo: '12350',
     date: moment('10/5/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: 20,
     out: null,
     unitCost: 1.85,
     balanceQuantity: 150,
     totalCost: 37.0,
     totalSales: null,
-    balanceCost: 302.0
+    balanceCost: 302.0,
+    remark: null
   },
   {
     itemId: '0001',
     batchNo: null,
     documentNo: 'INV20170430',
     date: moment('30/4/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 20,
     unitCost: 4.9,
     balanceQuantity: 80,
     totalCost: null,
     totalSales: 98.0,
-    balanceCost: 160.0
+    balanceCost: 160.0,
+    remark: null
   },
   {
     itemId: '0001',
     batchNo: null,
     documentNo: 'INV20170531',
     date: moment('31/5/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 50,
     unitCost: 4.9,
     balanceQuantity: 100,
     totalCost: null,
     totalSales: 245.0,
-    balanceCost: 202.0
+    balanceCost: 202.0,
+    remark: null
   },
   {
     itemId: '0001',
     batchNo: null,
     documentNo: 'INV20170630',
     date: moment('30/6/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 10,
     unitCost: 4.9,
     balanceQuantity: 90,
     totalCost: null,
     totalSales: 49.0,
-    balanceCost: 182.0
+    balanceCost: 182.0,
+    remark: null
   },
   {
     itemId: '0001',
     batchNo: null,
     documentNo: 'INV20170731',
     date: moment('31/7/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 25,
     unitCost: 4.9,
     balanceQuantity: 65,
     totalCost: null,
     totalSales: 122.5,
-    balanceCost: 131.5
+    balanceCost: 131.5,
+    remark: null
   },
   {
     itemId: '0001',
     batchNo: null,
     documentNo: 'INV20170831',
     date: moment('31/8/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 35,
     unitCost: 4.9,
     balanceQuantity: 30,
     totalCost: null,
     totalSales: 171.5,
-    balanceCost: 68.5
+    balanceCost: 68.5,
+    remark: null
   },
   {
     itemId: '0002',
     batchNo: 'B002',
     documentNo: '12345',
     date: moment('1/4/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: 200,
     out: null,
     unitCost: 2.55,
     balanceQuantity: 100,
     totalCost: 510.0,
     totalSales: null,
-    balanceCost: 200.0
+    balanceCost: 200.0,
+    remark: null
   },
   {
     itemId: '0002',
     batchNo: null,
     documentNo: 'INV20170430',
     date: moment('30/4/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 20,
     unitCost: 5.1,
     balanceQuantity: 80,
     totalCost: null,
     totalSales: 102.0,
-    balanceCost: 204.0
+    balanceCost: 204.0,
+    remark: null
   },
   {
     itemId: '0002',
     batchNo: 'B004',
     documentNo: '12346',
     date: moment('3/5/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: 100,
     out: null,
     unitCost: 2.65,
     balanceQuantity: 180,
     totalCost: 265.0,
     totalSales: null,
-    balanceCost: 469.0
+    balanceCost: 469.0,
+    remark: null
   },
   {
     itemId: '0002',
     batchNo: 'B006',
     documentNo: '12350',
     date: moment('10/5/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: 100,
     out: null,
     unitCost: 2.4,
     balanceQuantity: 280,
     totalCost: 240.0,
     totalSales: null,
-    balanceCost: 709.0
+    balanceCost: 709.0,
+    remark: null
   },
   {
     itemId: '0002',
@@ -202,46 +226,53 @@ let itemDetails = [
     balanceQuantity: 230,
     totalCost: null,
     totalSales: 255.0,
-    balanceCost: 581.5
+    balanceCost: 581.5,
+    remark: null
   },
   {
     itemId: '0002',
     batchNo: null,
     documentNo: 'INV20170630',
     date: moment('30/6/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 20,
     unitCost: 5.1,
     balanceQuantity: 210,
     totalCost: null,
     totalSales: 102.0,
-    balanceCost: 530.5
+    balanceCost: 530.5,
+    remark: null
   },
   {
     itemId: '0002',
     batchNo: null,
     documentNo: 'INV20170731',
     date: moment('31/7/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 5,
     unitCost: 5.1,
     balanceQuantity: 205,
     totalCost: null,
     totalSales: 25.5,
-    balanceCost: 517.75
+    balanceCost: 517.75,
+    remark: null
   },
   {
     itemId: '0002',
     batchNo: null,
     documentNo: 'INV20170831',
     date: moment('31/8/2017', 'DD-M-YYYY'),
+    outlet: 'A',
     in: null,
     out: 30,
     unitCost: 4.9,
     balanceQuantity: 175,
     totalCost: null,
     totalSales: 147.0,
-    balanceCost: 438.75
+    balanceCost: 438.75,
+    remark: null
   }
 ]
 
