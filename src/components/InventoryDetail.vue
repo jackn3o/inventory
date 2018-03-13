@@ -36,11 +36,17 @@
                               slot-scope="props">
                         <td>{{ props.item.documentNo }}</td>
                         <td>{{ props.item.batchNo }}</td>
+                        <td>{{ props.item.outlet }}</td>
                         <td>{{ $moment(props.item.date).format('DD/MMM/YYYY') }}</td>
                         <td>{{ props.item.unitCost.toFixed(2) }}</td>
                         <td class="text-xs-right green--text">{{ props.item.in }}</td>
                         <td class="text-xs-right red--text">{{ props.item.out }}</td>
                         <td class="text-xs-right">{{ props.item.balanceQuantity }}</td>
+                        <td class="text-xs-center">
+                            <v-icon color="red"
+                                    v-if="props.item.remark">announcement
+                            </v-icon>
+                        </td>
                     </template>
                     <v-alert slot="no-results"
                              :value="true"
@@ -69,11 +75,13 @@ export default {
             headers: [
                 { text: 'Document No', align: 'left', sortable: true, value: 'documentNo' },
                 { text: 'Batch No', align: 'left', sortable: true, value: 'batchNo' },
+                { text: 'Outlet', align: 'left', sortable: true, value: 'outlet' },
                 { text: 'Date', align: 'left', sortable: true, value: 'date' },
                 { text: 'Cost', align: 'left', sortable: true, value: 'unitCost' },
                 { text: 'In', align: 'right', sortable: true, value: 'in' },
                 { text: 'Out', align: 'right', sortable: true, value: 'out' },
-                { text: 'Balance Quantity', align: 'right', sortable: true, value: 'balanceQuantity' }
+                { text: 'Balance Quantity', align: 'right', sortable: true, value: 'balanceQuantity' },
+                { text: '', align: 'center', sortable: false, value: 'remark' }
             ],
             details: [],
             currentItem: {},
