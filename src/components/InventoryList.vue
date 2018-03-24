@@ -45,14 +45,13 @@
                             <v-list-tile slot="activator">
                                 <v-list-tile-content>
                                     <v-list-tile-title>
-                                        {{ category.description }}
-
+                                        <div class="group_title">
+                                            {{ category.description }}
+                                            <div class="category_count_badge">{{ category.items.length || 0 }}</div>
+                                        </div>
                                     </v-list-tile-title>
+
                                 </v-list-tile-content>
-                                <v-list-tile-action>
-                                    <v-chip small
-                                            disabled>{{ category.items.length || 0 }}</v-chip>
-                                </v-list-tile-action>
                             </v-list-tile>
                             <v-list-tile v-for="item in category.items"
                                          :key="item.code"
@@ -69,12 +68,14 @@
                                     <v-list-tile-title class="body-1">
                                         {{ item.code }} - {{ item.description}}
                                     </v-list-tile-title>
+                                    <v-list-tile-sub-title>
+                                        {{ item.outlet }}
+                                    </v-list-tile-sub-title>
                                 </v-list-tile-content>
                                 <v-list-tile-action>
                                     {{ item.balance }}
                                 </v-list-tile-action>
                             </v-list-tile>
-
                         </v-list-group>
                     </v-list>
                 </v-card>
@@ -208,5 +209,29 @@ export default {
 <style>
 .inventory_list_group .list__group__header .list__tile {
     padding-right: 0;
+}
+.inventory_list_group .list__group__header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    -webkit-transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+.inventory_list_group .list__group__header.list__group__header--active {
+    border-bottom: 0;
+}
+.inventory_list_group .group_title {
+    display: flex;
+}
+.category_count_badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #ccc;
+    color: #888;
+    padding: 2px;
+    font-size: 10px;
+    margin-left: 10px;
+    width: 24px;
+    height: 20px;
 }
 </style>
