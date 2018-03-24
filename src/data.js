@@ -16,6 +16,7 @@ let list = [
       code: 'VIB 01',
       description: 'Vibration',
       color: 'Pink',
+      outlet: 'Lazada',
       balance: 24
     }]
   },
@@ -29,6 +30,7 @@ let list = [
       code: 'Bra No.4',
       description: 'Sporty Bra-Limited Edition',
       color: 'White',
+      outlet: 'Q10',
       balance: 24
     }]
   }
@@ -301,7 +303,6 @@ export let getInventoryById = str_id =>
         return false
       }
     })
-    debugger
     resolve(obj_result)
   })
 
