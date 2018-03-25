@@ -5,7 +5,7 @@
         <v-layout fill-height>
             <v-flex style="position: relative; overflow:hidden;"
                     :class="contentClasses"
-                    :hidden-sm-and-down="$route.name !== 'inventory:list'">
+                    :hidden-sm-and-down="$route.name !== 'inventory.list'">
                 <v-card tile
                         height="100%">
                     <v-toolbar color="grey lighten-4"
@@ -145,8 +145,8 @@ export default {
         },
         contentClasses() {
             return {
-                sm3: this.$route.name == 'inventory:list',
-                sm3: this.$route.name !== 'inventory:list'
+                sm3: this.$route.name == 'inventory.list',
+                sm3: this.$route.name !== 'inventory.list'
             }
         },
         title() {
@@ -169,7 +169,7 @@ export default {
         select(str_id) {
             let vm = this
 
-            this.$router.push({ name: 'inventory:detail', params: { id: str_id } })
+            this.$router.push({ name: 'inventory.detail', params: { id: str_id } })
         },
         getAvatarClass(color) {
             if (!color) {

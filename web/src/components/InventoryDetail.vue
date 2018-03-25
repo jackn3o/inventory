@@ -12,7 +12,7 @@
                        extended>
                 <v-btn icon
                        class="hidden-md-and-up"
-                       @click.native="$router.push({name:'inventory:list'})">
+                       @click.native="$router.push({name:'inventory.list'})">
                     <v-icon>keyboard_backspace</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
