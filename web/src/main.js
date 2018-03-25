@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+import Router from 'vue-router'
 import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
@@ -11,12 +12,11 @@ import VueMomentJS from "vue-momentjs";
 import lodash from 'lodash'
 import VueLodash from 'vue-lodash'
 
- 
 Vue.use(Vuetify)
 Vue.use(VueMomentJS, moment);
 Vue.use(VueLodash, lodash)
-
 Vue.config.productionTip = false
+
 
 /* eslint-disable no-new */
 new Vue({
