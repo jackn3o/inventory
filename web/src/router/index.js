@@ -43,9 +43,6 @@ router.beforeEach((to, from, next) => {
     if (!store.getters.authorized) {
       next({
         path: '/login',
-        query: {
-          redirect: to.fullPath
-        }
       })
       return
     }
