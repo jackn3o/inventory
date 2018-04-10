@@ -91,7 +91,15 @@ export default {
         }
     },
     methods: {
-        authenticate() {}
+        authenticate() {
+            let obj_user = {
+                username: 'test',
+                password: '1111qqqq'
+            }
+            this.axios.post('localhost:8000/authenticate', obj_user).then(obj_response => {
+                console.log(obj_response.data)
+            })
+        }
     }
 }
 </script>
