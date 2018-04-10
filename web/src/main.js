@@ -5,16 +5,20 @@ import App from './App'
 import Router from 'vue-router'
 import router from './router'
 import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.min.css'
 import store from './store'
 import moment from "moment";
 import VueMomentJS from "vue-momentjs";
 import lodash from 'lodash'
 import VueLodash from 'vue-lodash'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+
+import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify)
 Vue.use(VueMomentJS, moment);
 Vue.use(VueLodash, lodash)
+Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 
 

@@ -10,9 +10,11 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "lodash": "^4.17.5",
     "moment": "^2.20.1",
     "vue": "^2.5.2",
+    "vue-axios": "^2.1.0",
     "vue-lodash": "^1.0.4",
     "vue-momentjs": "^0.1.1",
     "vue-router": "^3.0.1",
