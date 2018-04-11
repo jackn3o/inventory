@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	service "./base/service"
+	authenticationService "./services/authentication"
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/handlers"
@@ -16,26 +18,30 @@ import (
 
 func main() {
 	// Here we are instantiating the gorilla/mux router
-	r := mux.NewRouter()
+	router := mux.NewRouter()
+	apiRouter := router.PathPrefix("api/v1").Subrouter()
 
 	// On the default page we will simply serve our static index page.
-	r.Handle("/", http.FileServer(http.Dir("./views/")))
+	router.Handle("/", http.FileServer(http.Dir("./views/")))
 	// We will setup our server so we can serve static assest like images, css from the /static/{file} route
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
 	// Our API is going to consist of three routes
 	// /status - which we will call to make sure that our API is up and running
 	// /products - which will retrieve a list of products that the user can leave feedback on
 	// /products/{slug}/feedback - which will capture user feedback on products
-	r.Handle("/status", NotImplemented).Methods("GET")
+	router.Handle("/status", NotImplemented).Methods("GET")
 	/* We will add the middleware to our products and feedback routes. The status route will be publicly accessible */
-	r.Handle("/products", jwtMiddleware.Handler(ProductsHandler)).Methods("GET")
-	r.Handle("/products/{slug}/feedback", jwtMiddleware.Handler(AddFeedbackHandler)).Methods("POST")
+	router.Handle("/products", jwtMiddleware.Handler(ProductsHandler)).Methods("GET")
+	router.Handle("/products/{slug}/feedback", jwtMiddleware.Handler(AddFeedbackHandler)).Methods("POST")
 
-	r.Handle("/get-token", GetTokenHandler).Methods("GET")
+	router.Handle("/get-token", GetTokenHandler).Methods("GET")
+
+	service.Register(apiRouter, "authentication", authenticationService.New(), jwtmiddleware)
+	service.Register(apiRouter, "public", authenticationService.New())
 
 	// Our application will run on port 3000. Here we declare the port and pass in our router.
-	http.ListenAndServe(":3000", handlers.LoggingHandler(os.Stdout, r))
+	http.ListenAndServe(":3000", handlers.LoggingHandler(os.Stdout, router))
 }
 
 var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

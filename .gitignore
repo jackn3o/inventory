@@ -16,3 +16,4 @@ selenium-debug.log
 *.sln
 package-lock.json
 inventory.exe
+*.exe
