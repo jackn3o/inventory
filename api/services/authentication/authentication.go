@@ -5,12 +5,16 @@ import (
 	"path"
 
 	base "../../base/service"
+	utility "../../base/utilities"
 )
 
 type service struct {
 }
 
-func (s *service) CreateEndPoints(basePath string, mw ...base.Middleware) []base.EndPoint {
+type test struct {
+}
+
+func (s *service) Create(basePath string, mw ...base.Middleware) []base.EndPoint {
 	return []base.EndPoint{
 		base.EndPoint{
 			Path:    path.Join(basePath, ""),
@@ -20,10 +24,13 @@ func (s *service) CreateEndPoints(basePath string, mw ...base.Middleware) []base
 	}
 }
 
-// func New() router.Service {
-// 	return service{}
-// }
+// New is a constructor for creating authentication service.
+func New() base.Service {
+	return &service{}
+}
 
 var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Not Implemented"))
+	u := utility.New(w, r)
+
+	u.WriteJSON("Not Implemented")
 })

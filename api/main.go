@@ -19,7 +19,14 @@ import (
 func main() {
 	// Here we are instantiating the gorilla/mux router
 	router := mux.NewRouter()
-	apiRouter := router.PathPrefix("api/v1").Subrouter()
+	apiRouter := router.PathPrefix("/api/v1").Subrouter()
+
+	var jwtmw = jwtmiddleware.New(jwtmiddleware.Options{
+		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+			return mySigningKey, nil
+		},
+		SigningMethod: jwt.SigningMethodHS256,
+	})
 
 	// On the default page we will simply serve our static index page.
 	router.Handle("/", http.FileServer(http.Dir("./views/")))
@@ -32,13 +39,13 @@ func main() {
 	// /products/{slug}/feedback - which will capture user feedback on products
 	router.Handle("/status", NotImplemented).Methods("GET")
 	/* We will add the middleware to our products and feedback routes. The status route will be publicly accessible */
-	router.Handle("/products", jwtMiddleware.Handler(ProductsHandler)).Methods("GET")
-	router.Handle("/products/{slug}/feedback", jwtMiddleware.Handler(AddFeedbackHandler)).Methods("POST")
+	router.Handle("/products", jwtmw.Handler(ProductsHandler)).Methods("GET")
+	router.Handle("/products/{slug}/feedback", jwtmw.Handler(AddFeedbackHandler)).Methods("POST")
 
 	router.Handle("/get-token", GetTokenHandler).Methods("GET")
 
-	service.Register(apiRouter, "authentication", authenticationService.New(), jwtmiddleware)
-	service.Register(apiRouter, "public", authenticationService.New())
+	service.Register(apiRouter, "/authentication", authenticationService.New(), jwtmw)
+	service.Register(apiRouter, "/public", authenticationService.New())
 
 	// Our application will run on port 3000. Here we declare the port and pass in our router.
 	http.ListenAndServe(":3000", handlers.LoggingHandler(os.Stdout, router))
@@ -69,13 +76,6 @@ var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 
 	/* Finally, write the token to the browser window */
 	w.Write([]byte(tokenString))
-})
-
-var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
-	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return mySigningKey, nil
-	},
-	SigningMethod: jwt.SigningMethodHS256,
 })
 
 /* We will first create a new type called Product
