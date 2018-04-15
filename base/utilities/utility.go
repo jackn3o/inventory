@@ -6,8 +6,8 @@ import (
 )
 
 type meta struct {
-	Code     int    `json:"code"`
-	Status   string `json:"status"`
+	Code     int    `json:"code,omitempty"`
+	Status   string `json:"status,omitempty"`
 	Messages string `json:"message,omitempty"`
 }
 
@@ -68,4 +68,9 @@ func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 	}
 
 	return err
+}
+
+// NotImplemented as a utitlies
+func (u *Utility) NotImplemented() {
+	u.Writer.Write([]byte("Not Implemented"))
 }
