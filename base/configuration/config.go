@@ -19,7 +19,14 @@ const (
 	AppAPIBase      = "app.apiBase"
 	AppReadTimeout  = "app.timeout.read"
 	AppWriteTimeout = "app.timeout.write"
-	SecretKey       = "secretKey"
+
+	DatabaseHost     = "database.host"
+	DatabaseName     = "database.name"
+	DatabaseUsername = "database.username"
+	DatabasePassword = "database.password"
+	DatabaseTimeout  = "database.timeout"
+
+	SecretKey = "secretKey"
 )
 
 // Config is duplicate of viper interface
@@ -170,7 +177,7 @@ func (cfg *appConfig) Update() {
 func New(appName string, cmd *cobra.Command, configDir ...string) (Config, error) {
 
 	v := viper.New()
-	v.SetDefault(AppListenPort, ":1234")
+	v.SetDefault(AppListenPort, ":3000")
 	// v.SetDefault(OptSSLCertificate, "")
 	// v.SetDefault(OptSSLCertificateKey, "")
 	// v.SetDefault(OptLogEnableRotation, true)
@@ -192,7 +199,7 @@ func New(appName string, cmd *cobra.Command, configDir ...string) (Config, error
 	cfg := &appConfig{v, cmd}
 
 	// set default flag
-	cfg.FlagString(AppListenHost, "localhost:8000", "App host url")
+	cfg.FlagString(AppListenHost, "localhost:3000", "App host url")
 	cfg.FlagString(AppListenPort, ":3000", "Port to run http server on")
 	cfg.FlagString(AppName, appName, "Application Name")
 	// cfg.FlagString(OptSSLCertificate, "", "SSL Certificate")

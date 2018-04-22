@@ -1,0 +1,9 @@
+mongod --dbpath "d:\mongodb\data" --logpath "d:\mongodb\logs.txt" --install --serviceName "MongoDB"
+
+db.createUser( { user: "sa", pwd: "p@ssw0rd", roles: [ "userAdminAnyDatabase", "clusterAdmin", "readWriteAnyDatabase" ,"dbAdminAnyDatabase" ] } )
+
+db.auth("sa", "p@ssw0rd")
+
+
+
+db.createUser(   {     user: "sa"   ,  pwd: "p@ssw0rd"  ,  roles: [ "readWrite", "dbAdmin"]   })

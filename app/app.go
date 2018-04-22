@@ -6,22 +6,19 @@ import (
 	"net/http"
 
 	service "../base/service"
-	authenticationService "../services/authentication"
+	authenticationservice "../services/authentication"
+	masterservice "../services/master"
 
 	"../base/configuration"
+	"../base/connector"
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 )
 
-/* Set up a global string for our secret */
-var mySigningKey = []byte("secret")
-
 // Start up for app
 func Start(config configuration.Config) {
 	rootContext, rootCancel := context.WithCancel(context.Background())
-
-	// Here we are instantiating the gorilla/mux router
 
 	appListenHost := config.GetString(configuration.AppListenHost)
 	router := mux.NewRouter()
@@ -43,6 +40,7 @@ func Start(config configuration.Config) {
 
 // setupRouter for api service
 func setupRouter(ctx context.Context, config configuration.Config, router *mux.Router) {
+
 	var jwtmw = jwtmiddleware.New(jwtmiddleware.Options{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 			return []byte(config.GetString(configuration.SecretKey)), nil
@@ -50,8 +48,12 @@ func setupRouter(ctx context.Context, config configuration.Config, router *mux.R
 		SigningMethod: jwt.SigningMethodHS256,
 	})
 
+	store := connector.New(config)
+	defer store.DB.Close()
+	test := config.GetString(configuration.DatabaseName)
+	fmt.Println(test)
 	apiRouter := router.PathPrefix(config.GetString(configuration.AppAPIBase)).Subrouter()
-
-	service.Register(apiRouter, "/authentication", authenticationService.New(config), jwtmw)
-	service.Register(apiRouter, "/public", authenticationService.New(config))
+	service.Register(apiRouter, "/authentication", authenticationservice.New(store, config), jwtmw)
+	service.Register(apiRouter, "/public", authenticationservice.New(store, config))
+	service.Register(apiRouter, "/master", masterservice.New(store, config))
 }

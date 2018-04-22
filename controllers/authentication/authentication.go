@@ -7,21 +7,21 @@ import (
 	"time"
 
 	configuration "../../base/configuration"
+	"../../base/connector"
 	utility "../../base/utilities"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 // Controller is return value for New method
 type Controller struct {
-	// conn   *conn.Bundle
+	store  *connector.Store
 	config configuration.Config
 }
 
 // New method is a constructor for controller.
-func New(config configuration.Config) *Controller {
-	// conn *conn.Bundle,// todo add back to para after db is setup
+func New(store *connector.Store, config configuration.Config) *Controller {
 	return &Controller{
-		// conn: conn,
+		store:  store,
 		config: config,
 	}
 }
