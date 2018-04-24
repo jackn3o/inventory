@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	service "../base/service"
 	authenticationservice "../services/authentication"
@@ -25,8 +26,8 @@ func Start(config configuration.Config) {
 
 	setupRouter(rootContext, config, router)
 	server := http.Server{
-		ReadTimeout:  config.GetDuration(configuration.AppReadTimeout),
-		WriteTimeout: config.GetDuration(configuration.AppWriteTimeout),
+		ReadTimeout:  config.GetDuration(configuration.AppReadTimeout) * time.Second,
+		WriteTimeout: config.GetDuration(configuration.AppWriteTimeout) * time.Second,
 		Handler:      router,
 		Addr:         appListenHost,
 	}
@@ -49,9 +50,7 @@ func setupRouter(ctx context.Context, config configuration.Config, router *mux.R
 	})
 
 	store := connector.New(config)
-	defer store.DB.Close()
-	test := config.GetString(configuration.DatabaseName)
-	fmt.Println(test)
+
 	apiRouter := router.PathPrefix(config.GetString(configuration.AppAPIBase)).Subrouter()
 	service.Register(apiRouter, "/authentication", authenticationservice.New(store, config), jwtmw)
 	service.Register(apiRouter, "/public", authenticationservice.New(store, config))

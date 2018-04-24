@@ -7,6 +7,7 @@ import (
 	configuration "../../base/configuration"
 	"../../base/connector"
 	utility "../../base/utilities"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Controller is return value for New method
@@ -30,15 +31,16 @@ const (
 )
 
 type Item struct {
-	Code           string    `bson:"code" json:"code"`
-	Description    string    `bson:"description" json:"description"`
-	Color          string    `bson:"color" json:"color"`
-	Category       string    `bson:"category" json:"category"`
-	OpeningBalance int       `bson:"openingBal" json:"openingBal"`
-	CreatedDate    time.Time `bson:"createdDate" json:"createdDate"`
-	CreatedBy      string    `bson:"createBy" json:"createBy"`
-	ModifiedDate   time.Time `bson:"modifiedDate" json:"modifiedDate"`
-	ModifiedBy     string    `bson:"modifiedBy" json:"modifiedBy"`
+	ID             bson.ObjectId `json:"_id" bson:"_id,omitempty"`
+	Code           string        `bson:"code" json:"code"`
+	Description    string        `bson:"description" json:"description"`
+	Color          string        `bson:"color,omitempty" json:"color"`
+	Category       string        `bson:"category" json:"category"`
+	OpeningBalance int           `bson:"openingBal" json:"openingBal"`
+	CreatedDate    time.Time     `bson:"createdDate" json:"createdDate"`
+	CreatedBy      string        `bson:"createBy" json:"createBy"`
+	ModifiedDate   time.Time     `bson:"modifiedDate,omitempty" json:"modifiedDate"`
+	ModifiedBy     string        `bson:"modifiedBy,omitempty" json:"modifiedBy"`
 }
 
 // CreateItem in master data
@@ -46,17 +48,29 @@ func (c *Controller) CreateItem() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		u := utility.New(writer, req)
 
-		session := c.store.DB
+		session := c.store.DB.Copy()
+		defer session.Close()
 
-		// Collection
 		collection := session.DB(c.databaseName).C(ItemCollection)
+		info, err := collection.Upsert(nil, Item{
+			Code:           "t",
+			Description:    "test",
+			Color:          "white",
+			Category:       "c",
+			OpeningBalance: 1,
+			CreatedDate:    time.Now(),
+			CreatedBy:      "admin",
+		})
 
-		// Insert
-		if err := collection.Insert(Item{
-			Description: "test",
-		}); err != nil {
+		var itemID bson.ObjectId
+		if info.UpsertedId != nil {
+			itemID = info.UpsertedId.(bson.ObjectId)
+		}
+
+		if err != nil {
 			panic(err)
 		}
-		u.WriteJSON("OK")
+
+		u.WriteJSON(itemID)
 	})
 }
