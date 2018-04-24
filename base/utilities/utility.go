@@ -6,15 +6,14 @@ import (
 )
 
 type meta struct {
-	Code     int    `json:"code,omitempty"`
-	Status   string `json:"status,omitempty"`
-	Messages string `json:"message,omitempty"`
+	Code     int         `json:"code,omitempty"`
+	Status   string      `json:"status,omitempty"`
+	Messages interface{} `json:"message,omitempty"`
 }
 
 type jsonResponseDTO struct {
 	Data interface{} `json:"data,omitempty"`
 	Meta meta        `json:"meta,omitempty"`
-	Info string      `json:"info,omitempty"`
 }
 
 // Utility is common helper
@@ -50,10 +49,6 @@ func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 	}
 	data, err := json.Marshal(jsonResponseDTO{
 		Data: value,
-		Meta: meta{
-			Code:   statusCode,
-			Status: http.StatusText(statusCode),
-		},
 	})
 
 	if err != nil {
@@ -68,6 +63,23 @@ func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 	}
 
 	return err
+}
+
+// WriteJSONMeta return JSON format data to client
+func (u *Utility) WriteJSONMeta(value interface{}, statusCode int) {
+	meta, err := json.Marshal(jsonResponseDTO{
+		Meta: meta{
+			Code:     statusCode,
+			Status:   http.StatusText(statusCode),
+			Messages: value,
+		},
+	})
+
+	if err != nil {
+		http.Error(u.Writer, err.Error(), http.StatusInternalServerError)
+	} else {
+		u.Writer.Write(meta)
+	}
 }
 
 // NotImplemented as a utitlies
