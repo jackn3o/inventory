@@ -52,7 +52,7 @@ func (c *Controller) CreateItem() http.Handler {
 		defer session.Close()
 
 		collection := session.DB(c.databaseName).C(ItemCollection)
-		info, err := collection.Upsert(nil, Item{
+		item := Item{
 			Code:           "t",
 			Description:    "test",
 			Color:          "white",
@@ -60,17 +60,27 @@ func (c *Controller) CreateItem() http.Handler {
 			OpeningBalance: 1,
 			CreatedDate:    time.Now(),
 			CreatedBy:      "admin",
-		})
-
-		var itemID bson.ObjectId
-		if info.UpsertedId != nil {
-			itemID = info.UpsertedId.(bson.ObjectId)
 		}
 
+		count, err := collection.Find(bson.M{"code": item.Code}).Count()
 		if err != nil {
+			u.WriteJSONMeta("verification failed", http.StatusInternalServerError)
+			return
+		}
+
+		if count != 0 {
+			u.WriteJSONMeta("code exist", http.StatusConflict)
+			return
+		}
+
+		item.ID = bson.NewObjectId()
+		err = collection.Insert(item)
+
+		if err != nil {
+			u.WriteJSONMeta("code exist", http.StatusInternalServerError)
 			panic(err)
 		}
 
-		u.WriteJSON(itemID)
+		u.WriteJSON(item.ID, http.StatusCreated)
 	})
 }
