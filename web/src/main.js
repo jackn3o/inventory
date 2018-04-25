@@ -12,15 +12,16 @@ import lodash from 'lodash'
 import VueLodash from 'vue-lodash'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-
+import config from './config.js'
 import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify)
 Vue.use(VueMomentJS, moment);
 Vue.use(VueLodash, lodash)
-Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
+const instance = axios.create(config);
 
+Vue.use(VueAxios, instance)
 
 /* eslint-disable no-new */
 new Vue({
