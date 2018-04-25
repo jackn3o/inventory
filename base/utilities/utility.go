@@ -5,15 +5,15 @@ import (
 	"net/http"
 )
 
-type meta struct {
-	Code     int         `json:"code,omitempty"`
-	Status   string      `json:"status,omitempty"`
-	Messages interface{} `json:"message,omitempty"`
+type errorResponse struct {
+	Code    int         `json:"code,omitempty"`
+	Status  string      `json:"status,omitempty"`
+	Message interface{} `json:"message,omitempty"`
 }
 
 type jsonResponseDTO struct {
-	Data interface{} `json:"data,omitempty"`
-	Meta meta        `json:"meta,omitempty"`
+	Data  interface{}   `json:"data,omitempty"`
+	Error errorResponse `json:"meta,omitempty"`
 }
 
 // Utility is common helper
@@ -28,33 +28,6 @@ func New(writer http.ResponseWriter, req *http.Request) *Utility {
 		Writer:  writer,
 		Request: req,
 	}
-}
-
-// WriteStatus return code and status to client
-func (u *Utility) WriteStatus(code int, vars ...string) {
-	status := http.StatusText(code)
-	if len(vars) > 0 {
-		status = vars[0]
-	}
-
-	u.Writer.WriteHeader(code)
-	u.Writer.Write([]byte(status))
-}
-
-// WriteCreated as 201 common response
-// For major POST with related info return
-func (u *Utility) WriteCreated(value interface{}) {
-	statusCode := http.StatusCreated
-
-	u.WriteJSON(value, statusCode)
-}
-
-// WriteNoContent as 204 common response
-// For major PUT and Patch without related info return
-func (u *Utility) WriteNoContent(value interface{}) {
-	statusCode := http.StatusNoContent
-
-	u.WriteJSON(value, statusCode)
 }
 
 // WriteJSON return JSON format data to client, default 200
@@ -81,20 +54,20 @@ func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 	return err
 }
 
-// WriteJSONMeta return JSON format data to client
-func (u *Utility) WriteJSONMeta(value interface{}, statusCode int) {
-	meta, err := json.Marshal(jsonResponseDTO{
-		Meta: meta{
-			Code:     statusCode,
-			Status:   http.StatusText(statusCode),
-			Messages: value,
+// WriteJSONError return JSON error to client
+func (u *Utility) WriteJSONError(value interface{}, statusCode int) {
+	errResponse, err := json.Marshal(jsonResponseDTO{
+		Error: errorResponse{
+			Code:    statusCode,
+			Status:  http.StatusText(statusCode),
+			Message: value,
 		},
 	})
 
 	if err != nil {
 		http.Error(u.Writer, err.Error(), http.StatusInternalServerError)
 	} else {
-		u.Writer.Write(meta)
+		u.Writer.Write(errResponse)
 	}
 }
 
