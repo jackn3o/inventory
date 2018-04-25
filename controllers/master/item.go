@@ -26,10 +26,12 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 	}
 }
 
+// Key for collection
 const (
-	ItemCollection = "item"
+	ItemsCollection = "items"
 )
 
+// Item Model for items Collection
 type Item struct {
 	ID             bson.ObjectId `json:"_id" bson:"_id,omitempty"`
 	Code           string        `bson:"code" json:"code"`
@@ -51,7 +53,7 @@ func (c *Controller) CreateItem() http.Handler {
 		session := c.store.DB.Copy()
 		defer session.Close()
 
-		collection := session.DB(c.databaseName).C(ItemCollection)
+		collection := session.DB(c.databaseName).C(ItemsCollection)
 		item := Item{
 			Code:           "t",
 			Description:    "test",
@@ -64,12 +66,12 @@ func (c *Controller) CreateItem() http.Handler {
 
 		count, err := collection.Find(bson.M{"code": item.Code}).Count()
 		if err != nil {
-			u.WriteJSONMeta("verification failed", http.StatusInternalServerError)
+			u.WriteJSONError("verification failed", http.StatusInternalServerError)
 			return
 		}
 
 		if count != 0 {
-			u.WriteJSONMeta("code exist", http.StatusConflict)
+			u.WriteJSONError("code exist", http.StatusConflict)
 			return
 		}
 
@@ -77,7 +79,7 @@ func (c *Controller) CreateItem() http.Handler {
 		err = collection.Insert(item)
 
 		if err != nil {
-			u.WriteJSONMeta("code exist", http.StatusInternalServerError)
+			u.WriteJSONError("code exist", http.StatusInternalServerError)
 			panic(err)
 		}
 
