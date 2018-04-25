@@ -41,7 +41,23 @@ func (u *Utility) WriteStatus(code int, vars ...string) {
 	u.Writer.Write([]byte(status))
 }
 
-// WriteJSON return JSON format data to client
+// WriteCreated as 201 common response
+// For major POST with related info return
+func (u *Utility) WriteCreated(value interface{}) {
+	statusCode := http.StatusCreated
+
+	u.WriteJSON(value, statusCode)
+}
+
+// WriteNoContent as 204 common response
+// For major PUT and Patch without related info return
+func (u *Utility) WriteNoContent(value interface{}) {
+	statusCode := http.StatusNoContent
+
+	u.WriteJSON(value, statusCode)
+}
+
+// WriteJSON return JSON format data to client, default 200
 func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 	statusCode := http.StatusOK
 	if len(vars) > 0 {
