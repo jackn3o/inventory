@@ -21,16 +21,16 @@
             </template>
         </v-toolbar>
         <v-card-text>
-            <v-text-field v-model="code"
+            <v-text-field v-model="model.code"
                           label="Code"
                           placeholder="Please describe"></v-text-field>
-            <v-text-field v-model="description"
+            <v-text-field v-model="model.description"
                           label="Description"
                           placeholder="Please describe"></v-text-field>
-            <v-text-field v-model="color"
+            <v-text-field v-model="model.color"
                           label="Color"
                           placeholder="Please describe"></v-text-field>
-            <v-text-field v-model="openBalance"
+            <v-text-field v-model="model.openBalance"
                           label="Opening Balance"
                           placeholder="Please describe"></v-text-field>
         </v-card-text>
@@ -41,10 +41,12 @@
 export default {
     data() {
         return {
-            code: null,
-            description: null,
-            color: null,
-            openBalance: null
+            model: {
+                code: null,
+                description: null,
+                color: null,
+                openBalance: null
+            }
         }
     },
     methods: {
@@ -61,10 +63,23 @@ export default {
                     balance: vm.openBalance
                 }
 
+            this.$axios.post
+
             MockData.addNewItem(obj_new).then(obj_response => {
                 vm.$emit('close')
             })
         }
+    },
+    mounted() {
+        console.log(1)
+        this.axios
+            .get('/public')
+            .then(obj_response => {
+                console.log(obj_response)
+            })
+            .catch(obj_exception => {
+                console.log(obj_exception)
+            })
     }
 }
 </script>
