@@ -42,6 +42,7 @@ func (u *Utility) UnmarshalWithValidation(value interface{}) error {
 	_, err := govalidator.ValidateStruct(value)
 	if err != nil {
 		println("error: " + err.Error())
+		return err
 	}
 
 	return nil
