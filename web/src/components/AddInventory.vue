@@ -51,39 +51,35 @@ export default {
     },
     methods: {
         addNewInventory() {
-            let vm = this,
-                MockData = require('./../data.js'),
-                nb_itemCount = MockData.items.length,
-                obj_new = {
-                    value: false,
-                    id: '000' + String(nb_itemCount + 1),
-                    code: vm.code,
-                    description: vm.description,
-                    color: vm.color,
-                    balance: vm.openBalance
-                }
+            let vm = this
+            vm.axios
+                .post('/master/items', vm.model)
+                .then(obj_response => {
+                    console.log(obj_response)
+                })
+                .catch(obj_exception => {
+                    console.log(obj_exception)
+                })
+            // let vm = this,
+            //     MockData = require('./../data.js'),
+            //     nb_itemCount = MockData.items.length,
+            //     obj_new = {
+            //         value: false,
+            //         id: '000' + String(nb_itemCount + 1),
+            //         code: vm.code,
+            //         description: vm.description,
+            //         color: vm.color,
+            //         balance: vm.openBalance
+            //     }
 
-            this.$axios.post
+            // this.$axios.post
 
-            MockData.addNewItem(obj_new).then(obj_response => {
-                vm.$emit('close')
-            })
+            // MockData.addNewItem(obj_new).then(obj_response => {
+            //     vm.$emit('close')
+            // })
         }
-    },
-    mounted() {
-        console.log(1)
-        this.axios
-            .get('/public')
-            .then(obj_response => {
-                console.log(obj_response)
-            })
-            .catch(obj_exception => {
-                console.log(obj_exception)
-            })
     }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
