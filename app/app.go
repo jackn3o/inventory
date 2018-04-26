@@ -15,6 +15,7 @@ import (
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 // Start up for app
@@ -25,10 +26,16 @@ func Start(config configuration.Config) {
 	router := mux.NewRouter()
 
 	setupRouter(rootContext, config, router)
+	corsmw := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		// AllowCredentials: true,
+		AllowedHeaders: []string{"Content-Type"},
+		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"},
+	})
 	server := http.Server{
 		ReadTimeout:  config.GetDuration(configuration.AppReadTimeout) * time.Second,
 		WriteTimeout: config.GetDuration(configuration.AppWriteTimeout) * time.Second,
-		Handler:      router,
+		Handler:      corsmw.Handler(router),
 		Addr:         appListenHost,
 	}
 
