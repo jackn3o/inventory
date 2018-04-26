@@ -33,12 +33,12 @@ const (
 
 // Item Model for items Collection
 type Item struct {
-	ID             bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
-	Code           string        `bson:"code" json:"code" valid:"-"`
-	Description    string        `bson:"description" json:"description" valid:"-"`
+	ID             bson.ObjectId `bson:"_id,omitempty" json:"_id"`
+	Code           string        `bson:"code" json:"code" valid:"required"`
+	Description    string        `bson:"description" json:"description" valid:"required"`
 	Color          string        `bson:"color,omitempty" json:"color" valid:"-"`
 	Category       string        `bson:"category" json:"category" valid:"-"`
-	OpeningBalance int           `bson:"openingBal" json:"openingBal" valid:"-"`
+	OpeningBalance int           `bson:"openingBal" json:"openingBal" valid:"required"`
 	CreatedDate    time.Time     `bson:"createdDate" json:"createdDate" valid:"-"`
 	CreatedBy      string        `bson:"createBy" json:"createBy" valid:"-"`
 	ModifiedDate   time.Time     `bson:"modifiedDate,omitempty" json:"modifiedDate" valid:"-"`
@@ -52,6 +52,10 @@ func (c *Controller) CreateItem() http.Handler {
 
 		item := &Item{}
 		err := u.UnmarshalWithValidation(item)
+		if err != nil {
+			u.WriteJSONError(err.Error(), http.StatusBadRequest)
+			return
+		}
 		session := c.store.DB.Copy()
 		defer session.Close()
 
