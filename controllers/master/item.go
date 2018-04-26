@@ -33,16 +33,16 @@ const (
 
 // Item Model for items Collection
 type Item struct {
-	ID             bson.ObjectId `json:"_id" bson:"_id,omitempty"`
-	Code           string        `bson:"code" json:"code"`
-	Description    string        `bson:"description" json:"description"`
-	Color          string        `bson:"color,omitempty" json:"color"`
-	Category       string        `bson:"category" json:"category"`
-	OpeningBalance int           `bson:"openingBal" json:"openingBal"`
-	CreatedDate    time.Time     `bson:"createdDate" json:"createdDate"`
-	CreatedBy      string        `bson:"createBy" json:"createBy"`
-	ModifiedDate   time.Time     `bson:"modifiedDate,omitempty" json:"modifiedDate"`
-	ModifiedBy     string        `bson:"modifiedBy,omitempty" json:"modifiedBy"`
+	ID             bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
+	Code           string        `bson:"code" json:"code" valid:"-"`
+	Description    string        `bson:"description" json:"description" valid:"-"`
+	Color          string        `bson:"color,omitempty" json:"color" valid:"-"`
+	Category       string        `bson:"category" json:"category" valid:"-"`
+	OpeningBalance int           `bson:"openingBal" json:"openingBal" valid:"-"`
+	CreatedDate    time.Time     `bson:"createdDate" json:"createdDate" valid:"-"`
+	CreatedBy      string        `bson:"createBy" json:"createBy" valid:"-"`
+	ModifiedDate   time.Time     `bson:"modifiedDate,omitempty" json:"modifiedDate" valid:"-"`
+	ModifiedBy     string        `bson:"modifiedBy,omitempty" json:"modifiedBy" valid:"-"`
 }
 
 // CreateItem in master data
@@ -50,20 +50,12 @@ func (c *Controller) CreateItem() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		u := utility.New(writer, req)
 
+		item := &Item{}
+		err := u.UnmarshalWithValidation(item)
 		session := c.store.DB.Copy()
 		defer session.Close()
 
 		collection := session.DB(c.databaseName).C(ItemsCollection)
-		item := Item{
-			Code:           "t",
-			Description:    "test",
-			Color:          "white",
-			Category:       "c",
-			OpeningBalance: 1,
-			CreatedDate:    time.Now(),
-			CreatedBy:      "admin",
-		}
-
 		count, err := collection.Find(bson.M{"code": item.Code}).Count()
 		if err != nil {
 			u.WriteJSONError("verification failed", http.StatusInternalServerError)
