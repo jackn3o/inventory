@@ -2,6 +2,7 @@ package utility
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -40,9 +41,21 @@ func (u *Utility) UnmarshalWithValidation(value interface{}) error {
 	}
 	govalidator.SetFieldsRequiredByDefault(true)
 	_, err := govalidator.ValidateStruct(value)
+
 	if err != nil {
-		println("error: " + err.Error())
-		return err
+		errs := err.(govalidator.Errors).Errors()
+		errWriter := ErrorWriter{}
+		for _, e := range errs {
+			v := e.(govalidator.Error)
+
+			if v.Validator == "required" && !v.CustomErrorMessageExists {
+				v.Err = errors.New(v.Name + " is required")
+			}
+
+			errWriter.Add(v.Name, v.Err.Error())
+		}
+
+		return errWriter.Errors()
 	}
 
 	return nil
