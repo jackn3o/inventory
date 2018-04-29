@@ -73,6 +73,8 @@ func (c *Controller) CreateItem() http.Handler {
 		}
 
 		item.ID = bson.NewObjectId()
+		item.CreatedDate = time.Now()
+		item.CreatedBy = "todo"
 		err = collection.Insert(item)
 
 		if err != nil {
@@ -88,8 +90,18 @@ func (c *Controller) CreateItem() http.Handler {
 func (c *Controller) GetItems() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		u := utility.New(writer, req)
+		session := c.store.DB.Copy()
+		defer session.Close()
 
-		u.WriteJSON("success")
+		var items []Item
+		collection := session.DB(c.databaseName).C(ItemsCollection)
+		err := collection.Find(nil).Sort("description").All(&items)
+		if err != nil {
+			u.WriteJSONError("verification failed", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON(items)
 	})
 }
 
@@ -108,6 +120,14 @@ func (c *Controller) GetItemByID() http.Handler {
 		session := c.store.DB.Copy()
 		defer session.Close()
 
-		u.WriteJSON(itemID)
+		var item Item
+		collection := session.DB(c.databaseName).C(ItemsCollection)
+		err := collection.FindId(bson.ObjectIdHex(itemID)).One(&item)
+		if err != nil {
+			u.WriteJSONError("verification failed", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON(item)
 	})
 }
