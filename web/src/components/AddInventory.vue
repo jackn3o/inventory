@@ -30,7 +30,8 @@
             <v-text-field v-model="model.color"
                           label="Color"
                           placeholder="Please describe"></v-text-field>
-            <v-text-field v-model="model.openBalance"
+            <v-text-field v-model="model.openingBalance"
+                          type="number"
                           label="Opening Balance"
                           placeholder="Please describe"></v-text-field>
         </v-card-text>
@@ -45,7 +46,7 @@ export default {
                 code: null,
                 description: null,
                 color: null,
-                openBalance: null
+                openingBalance: null
             }
         }
     },
@@ -53,7 +54,7 @@ export default {
         addNewInventory() {
             let vm = this
             vm.axios
-                .post('/master/items', vm.model)
+                .post('/setting/items', vm.model)
                 .then(obj_response => {
                     console.log(obj_response)
                 })
