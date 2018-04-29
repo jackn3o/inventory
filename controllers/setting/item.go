@@ -1,4 +1,4 @@
-package master
+package setting
 
 import (
 	"net/http"
@@ -7,6 +7,7 @@ import (
 	configuration "../../base/configuration"
 	"../../base/connector"
 	utility "../../base/utilities"
+	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -33,12 +34,12 @@ const (
 
 // Item Model for items Collection
 type Item struct {
-	ID             bson.ObjectId `bson:"_id,omitempty" json:"_id"`
+	ID             bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
 	Code           string        `bson:"code" json:"code" valid:"required"`
 	Description    string        `bson:"description" json:"description" valid:"required"`
 	Color          string        `bson:"color,omitempty" json:"color" valid:"-"`
 	Category       string        `bson:"category" json:"category" valid:"-"`
-	OpeningBalance int           `bson:"openingBal" json:"openingBal" valid:"required"`
+	OpeningBalance int           `bson:"openingBalance" json:"openingBalance,string" valid:"required"`
 	CreatedDate    time.Time     `bson:"createdDate" json:"createdDate" valid:"-"`
 	CreatedBy      string        `bson:"createBy" json:"createBy" valid:"-"`
 	ModifiedDate   time.Time     `bson:"modifiedDate,omitempty" json:"modifiedDate" valid:"-"`
@@ -80,5 +81,33 @@ func (c *Controller) CreateItem() http.Handler {
 		}
 
 		u.WriteJSON(item.ID, http.StatusCreated)
+	})
+}
+
+// GetItems return list of items
+func (c *Controller) GetItems() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+
+		u.WriteJSON("success")
+	})
+}
+
+// GetItemByID ...
+func (c *Controller) GetItemByID() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+
+		itemID := mux.Vars(req)["id"]
+
+		if len(itemID) <= 0 {
+			u.WriteJSONError("ID is require", http.StatusBadRequest)
+			return
+		}
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+
+		u.WriteJSON(itemID)
 	})
 }

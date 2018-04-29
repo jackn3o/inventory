@@ -1,4 +1,4 @@
-package master
+package setting
 
 import (
 	"path"
@@ -6,18 +6,28 @@ import (
 	configuration "../../base/configuration"
 	"../../base/connector"
 	base "../../base/service"
-	controller "../../controllers/master"
+	controller "../../controllers/setting"
 )
 
 // authenticationService is one router service.
-type masterService struct {
+type settingService struct {
 	store  *connector.Store
 	config configuration.Config
 }
 
-func (s *masterService) Create(basePath string, mw ...base.Middleware) []base.EndPoint {
+func (s *settingService) Create(basePath string, mw ...base.Middleware) []base.EndPoint {
 	c := controller.New(s.store, s.config)
 	return []base.EndPoint{
+		base.EndPoint{
+			Path:    path.Join(basePath, "/items"),
+			Handler: base.Use(c.GetItems(), mw...),
+			Method:  "GET",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/items/{id}"),
+			Handler: base.Use(c.GetItemByID(), mw...),
+			Method:  "GET",
+		},
 		base.EndPoint{
 			Path:    path.Join(basePath, "/items"),
 			Handler: base.Use(c.CreateItem(), mw...),
@@ -28,7 +38,7 @@ func (s *masterService) Create(basePath string, mw ...base.Middleware) []base.En
 
 // New is a constructor for creating authentication service.
 func New(store *connector.Store, config configuration.Config) base.Service {
-	return &masterService{
+	return &settingService{
 		config: config,
 		store:  store,
 	}
