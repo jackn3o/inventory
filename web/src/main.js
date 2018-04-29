@@ -19,10 +19,14 @@ Vue.use(Vuetify)
 Vue.use(VueMomentJS, moment)
 Vue.use(VueLodash, lodash)
 Vue.config.productionTip = false
-const source = axios.CancelToken.source()
 const instance = axios.create(axiosConfig)
 instance.interceptors.request.use(config => {
-  config.headers['Content-Type'] = 'application/json'
+  // if (config.method == 'post') {
+  //   config.headers['Content-Type'] = 'text/plain'
+  //   config.data = JSON.stringify(config.data)
+  // } else {
+  //   config.headers['Content-Type'] = 'application/json'
+  // }
 
   return config
 })
