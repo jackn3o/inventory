@@ -1,70 +1,63 @@
 <template>
-    <v-flex lg9
-            md9
-            sm12
-            style="position:relative;">
-        <v-card tile
-                height="100%"
-                style="z-index:6; overflow:hidden;">
-            <v-toolbar color="grey lighten-4"
-                       flat
-                       prominent
-                       extended>
-                <v-btn icon
-                       class="hidden-md-and-up"
-                       @click.native="$router.push({name:'inventory.list'})">
-                    <v-icon>keyboard_backspace</v-icon>
-                </v-btn>
-                <v-spacer></v-spacer>
-                <v-btn icon>
-                    <v-icon class="blue-grey--text text--darken-3">delete</v-icon>
-                </v-btn>
-                <v-btn icon>
-                    <v-icon class="blue-grey--text text--darken-3">more_vert</v-icon>
-                </v-btn>
-                <div slot="extension">
-                    <v-toolbar-title>{{ title }}</v-toolbar-title>
-                </div>
-            </v-toolbar>
-            <v-divider></v-divider>
-            <v-card-text>
-                <v-data-table :headers="headers"
-                              :items="details"
-                              :search="search"
-                              :rows-per-page-items="pagingSetting">
-                    <template slot="items"
-                              slot-scope="props">
-                        <td>{{ props.item.documentNo }}</td>
-                        <td>{{ props.item.batchNo }}</td>
-                        <td>{{ props.item.outlet }}</td>
-                        <td>{{ $moment(props.item.date).format('DD/MMM/YYYY') }}</td>
-                        <td>{{ props.item.unitCost.toFixed(2) }}</td>
-                        <td class="text-xs-right green--text">{{ props.item.in }}</td>
-                        <td class="text-xs-right red--text">{{ props.item.out }}</td>
-                        <td class="text-xs-right">{{ props.item.balanceQuantity }}</td>
-                        <td class="text-xs-center">
-                            <v-icon color="red"
-                                    v-if="props.item.remark">announcement
-                            </v-icon>
-                        </td>
-                    </template>
-                    <v-alert slot="no-results"
-                             :value="true"
-                             color="error"
-                             icon="warning">
-                        Your search for "{{ search }}" found no results.
-                    </v-alert>
-                </v-data-table>
-            </v-card-text>
-            <v-btn color="pink accent-1"
-                   dark
-                   absolute
-                   fab
-                   style="bottom: 16px; right: 16px;">
-                <v-icon>add</v-icon>
+    <div>
+        <v-toolbar color="grey lighten-4"
+                   flat
+                   prominent
+                   extended>
+            <v-btn icon
+                   class="hidden-md-and-up"
+                   @click.native="$router.push({name:'inventory.list'})">
+                <v-icon>keyboard_backspace</v-icon>
             </v-btn>
-        </v-card>
-    </v-flex>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+                <v-icon class="blue-grey--text text--darken-3">delete</v-icon>
+            </v-btn>
+            <v-btn icon>
+                <v-icon class="blue-grey--text text--darken-3">more_vert</v-icon>
+            </v-btn>
+            <div slot="extension">
+                <v-toolbar-title>{{ title }}</v-toolbar-title>
+            </div>
+        </v-toolbar>
+        <v-divider></v-divider>
+        <v-card-text>
+            <v-data-table :headers="headers"
+                          :items="details"
+                          :search="search"
+                          :rows-per-page-items="pagingSetting">
+                <template slot="items"
+                          slot-scope="props">
+                    <td>{{ props.item.documentNo }}</td>
+                    <td>{{ props.item.batchNo }}</td>
+                    <td>{{ props.item.outlet }}</td>
+                    <td>{{ $moment(props.item.date).format('DD/MMM/YYYY') }}</td>
+                    <td>{{ props.item.unitCost.toFixed(2) }}</td>
+                    <td class="text-xs-right green--text">{{ props.item.in }}</td>
+                    <td class="text-xs-right red--text">{{ props.item.out }}</td>
+                    <td class="text-xs-right">{{ props.item.balanceQuantity }}</td>
+                    <td class="text-xs-center">
+                        <v-icon color="red"
+                                v-if="props.item.remark">announcement
+                        </v-icon>
+                    </td>
+                </template>
+                <v-alert slot="no-results"
+                         :value="true"
+                         color="error"
+                         icon="warning">
+                    Your search for "{{ search }}" found no results.
+                </v-alert>
+            </v-data-table>
+        </v-card-text>
+        <v-btn color="pink"
+               dark
+               absolute
+               fab
+               style="bottom: 16px; right: 16px;">
+            <v-icon>add</v-icon>
+        </v-btn>
+    </div>
 </template>
 
 <script>

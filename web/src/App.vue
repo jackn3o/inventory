@@ -7,7 +7,75 @@
                 <v-flex xl10
                         offset-xl1
                         xs12>
-                    <router-view></router-view>
+                    <v-card height="100%"
+                            class="relative elevation-8">
+                        <v-navigation-drawer dark
+                                             stateless
+                                             permenant
+                                             absolute
+                                             hide-overlay
+                                             :mini-variant.sync="mini"
+                                             v-model="drawer"
+                                             style="z-index:5;">
+                            <!-- <v-toolbar flat
+                                       class="transparent">
+                                <v-list class="pa-0">
+
+                                </v-list>
+                            </v-toolbar> -->
+                            <v-list class="pt-0">
+                                <v-list-tile>
+                                    <v-list-tile-actions>
+                                        <v-btn icon
+                                               @click.native.stop="mini = !mini">
+                                            <v-icon>menu</v-icon>
+                                        </v-btn>
+                                    </v-list-tile-actions>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>Menu</v-list-tile-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-btn icon
+                                               @click.native.stop="mini = !mini">
+                                            <v-icon>chevron_left</v-icon>
+                                        </v-btn>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                                <v-divider></v-divider>
+                                <v-list-tile avatar>
+                                    <v-list-tile-avatar>
+                                        <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                                    </v-list-tile-avatar>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>John Leider</v-list-tile-title>
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                                <v-list-tile>
+                                    <v-list-tile-actions>
+                                        <v-btn icon
+                                               @click.native="">
+                                            <v-icon>storage</v-icon>
+                                        </v-btn>
+                                    </v-list-tile-actions>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>Inventory</v-list-tile-title>
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                                <v-list-tile>
+                                    <v-list-tile-actions>
+                                        <v-btn icon
+                                               @click.native="">
+                                            <v-icon>settings</v-icon>
+                                        </v-btn>
+                                    </v-list-tile-actions>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>Setting</v-list-tile-title>
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                            </v-list>
+                        </v-navigation-drawer>
+                        <router-view style="position:absolute; top:0; left:80px; width:calc(100% - 80px); height: 100%; z-index:4;"></router-view>
+                    </v-card>
                 </v-flex>
             </v-layout>
         </div>
@@ -19,7 +87,9 @@ export default {
     name: 'App',
     data() {
         return {
-            title: 'Vuetify.js'
+            title: 'Vuetify.js',
+            mini: true,
+            drawer: true
         }
     },
     computed: {
@@ -49,7 +119,10 @@ html {
 .inner_body {
     height: 100vh;
     width: 100vw;
-    background: url('./assets/background.jpg')no-repeat center center fixed;
+    /* background: url('./assets/background.jpg')no-repeat center center fixed; */
+}
+.relative {
+    position: relative;
 }
 
 .list__tile .list__tile__action > .avatar,

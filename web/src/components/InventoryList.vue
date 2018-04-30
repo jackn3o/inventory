@@ -1,10 +1,8 @@
 <template>
-    <v-card tile
-            height="100%"
-            class="transparent">
+    <div>
         <v-layout fill-height>
-            <v-flex style="position: relative; overflow:hidden;"
-                    :class="contentClasses"
+            <v-flex style="overflow:hidden;"
+                    :class="sideMenuClasses"
                     :hidden-sm-and-down="$route.name !== 'inventory.list'">
                 <v-card tile
                         height="100%">
@@ -86,13 +84,16 @@
                                    @close="close()"></add-inventory>
                 </transition>
             </v-flex>
-            <transition name="slide-x-reverse-transition"
-                        mode="in-out">
-                <!-- <transition :name="$route.name == 'inventory:list'? 'slide-x-reverse-transition':'slide-y-reverse-transition'"> -->
-                <router-view></router-view>
-            </transition>
+            <v-flex :class="contentClasses">
+                <transition name="slide-x-reverse-transition"
+                            mode="in-out">
+                    <!-- <transition :name="$route.name == 'inventory:list'? 'slide-x-reverse-transition':'slide-y-reverse-transition'"> -->
+                    <router-view style="z-index:6; overflow:hidden; height:100%; border-left: 1px solid rgba(0,0,0,0.12)">
+                    </router-view>
+                </transition>
+            </v-flex>
         </v-layout>
-    </v-card>
+    </div>
 </template>
 
 <script>
@@ -143,10 +144,16 @@ export default {
                 this.isShow2ndLevel = value
             }
         },
+        sideMenuClasses() {
+            return {
+                sm12: this.$route.name == 'inventory.list',
+                sm3: this.$route.name !== 'inventory.list'
+            }
+        },
         contentClasses() {
             return {
-                sm3: this.$route.name == 'inventory.list',
-                sm3: this.$route.name !== 'inventory.list'
+                xs0: this.$route.name == 'inventory.list',
+                sm9: this.$route.name !== 'inventory.list'
             }
         },
         title() {
