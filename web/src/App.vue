@@ -10,11 +10,10 @@
                     <v-card height="100%"
                             class="relative elevation-8">
                         <v-navigation-drawer dark
-                                             stateless
                                              permenant
                                              absolute
                                              hide-overlay
-                                             :mini-variant.sync="mini"
+                                             :mini-variant="mini"
                                              v-model="drawer"
                                              style="z-index:5;">
                             <!-- <v-toolbar flat
@@ -25,12 +24,12 @@
                             </v-toolbar> -->
                             <v-list class="pt-0">
                                 <v-list-tile>
-                                    <v-list-tile-actions>
+                                    <v-list-tile-action>
                                         <v-btn icon
                                                @click.native.stop="mini = !mini">
                                             <v-icon>menu</v-icon>
                                         </v-btn>
-                                    </v-list-tile-actions>
+                                    </v-list-tile-action>
                                     <v-list-tile-content>
                                         <v-list-tile-title>Menu</v-list-tile-title>
                                     </v-list-tile-content>
@@ -51,23 +50,21 @@
                                     </v-list-tile-content>
                                 </v-list-tile>
                                 <v-list-tile>
-                                    <v-list-tile-actions>
-                                        <v-btn icon
-                                               @click.native="">
+                                    <v-list-tile-action>
+                                        <v-btn icon>
                                             <v-icon>storage</v-icon>
                                         </v-btn>
-                                    </v-list-tile-actions>
+                                    </v-list-tile-action>
                                     <v-list-tile-content>
                                         <v-list-tile-title>Inventory</v-list-tile-title>
                                     </v-list-tile-content>
                                 </v-list-tile>
                                 <v-list-tile>
-                                    <v-list-tile-actions>
-                                        <v-btn icon
-                                               @click.native="">
+                                    <v-list-tile-action>
+                                        <v-btn icon>
                                             <v-icon>settings</v-icon>
                                         </v-btn>
-                                    </v-list-tile-actions>
+                                    </v-list-tile-action>
                                     <v-list-tile-content>
                                         <v-list-tile-title>Setting</v-list-tile-title>
                                     </v-list-tile-content>
