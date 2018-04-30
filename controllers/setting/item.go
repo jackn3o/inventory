@@ -54,7 +54,7 @@ func (c *Controller) CreateItem() http.Handler {
 		item := &Item{}
 		err := u.UnmarshalWithValidation(item)
 		if err != nil {
-			u.WriteJSONError(err.Error(), http.StatusBadRequest)
+			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
 		session := c.store.DB.Copy()
