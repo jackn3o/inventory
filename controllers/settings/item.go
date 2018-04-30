@@ -4,32 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	configuration "../../base/configuration"
-	"../../base/connector"
 	utility "../../base/utilities"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
-)
-
-// Controller is return value for New method
-type Controller struct {
-	databaseName string
-	store        *connector.Store
-	config       configuration.Config
-}
-
-// New method is a constructor for controller.
-func New(store *connector.Store, config configuration.Config) *Controller {
-	return &Controller{
-		databaseName: config.GetString(configuration.DatabaseName),
-		store:        store,
-		config:       config,
-	}
-}
-
-// Key for collection
-const (
-	ItemSettingCollection = "settings.items"
 )
 
 // Item Model for items Collection
@@ -40,9 +17,9 @@ type Item struct {
 	Color          string        `bson:"color,omitempty" json:"color" valid:"-"`
 	Category       string        `bson:"category" json:"category" valid:"-"`
 	OpeningBalance int           `bson:"openingBalance" json:"openingBalance,string" valid:"required"`
-	CreatedDate    time.Time     `bson:"createdDate" json:"createdDate" valid:"-"`
+	CreatedDate    *time.Time    `bson:"createdDate" json:"createdDate" valid:"-"`
 	CreatedBy      string        `bson:"createBy" json:"createBy" valid:"-"`
-	ModifiedDate   time.Time     `bson:"modifiedDate,omitempty" json:"modifiedDate" valid:"-"`
+	ModifiedDate   *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate" valid:"-"`
 	ModifiedBy     string        `bson:"modifiedBy,omitempty" json:"modifiedBy" valid:"-"`
 }
 
@@ -73,7 +50,8 @@ func (c *Controller) CreateItem() http.Handler {
 		}
 
 		item.ID = bson.NewObjectId()
-		item.CreatedDate = time.Now()
+		timeNow := time.Now()
+		item.CreatedDate = &timeNow
 		item.CreatedBy = "todo"
 		err = collection.Insert(item)
 

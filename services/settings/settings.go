@@ -18,6 +18,7 @@ type settingService struct {
 func (s *settingService) Create(basePath string, mw ...base.Middleware) []base.EndPoint {
 	c := controller.New(s.store, s.config)
 	return []base.EndPoint{
+		// item
 		base.EndPoint{
 			Path:    path.Join(basePath, "/items"),
 			Handler: base.Use(c.GetItems(), mw...),
@@ -31,6 +32,18 @@ func (s *settingService) Create(basePath string, mw ...base.Middleware) []base.E
 		base.EndPoint{
 			Path:    path.Join(basePath, "/items"),
 			Handler: base.Use(c.CreateItem(), mw...),
+			Method:  "POST",
+		},
+
+		// category
+		base.EndPoint{
+			Path:    path.Join(basePath, "/categories"),
+			Handler: base.Use(c.GetCategories(), mw...),
+			Method:  "GET",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/categories"),
+			Handler: base.Use(c.CreateCategory(), mw...),
 			Method:  "POST",
 		},
 	}
