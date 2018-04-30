@@ -1,4 +1,4 @@
-package setting
+package settings
 
 import (
 	"net/http"
@@ -29,7 +29,7 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 
 // Key for collection
 const (
-	ItemsCollection = "items"
+	ItemSettingCollection = "settings.items"
 )
 
 // Item Model for items Collection
@@ -60,7 +60,7 @@ func (c *Controller) CreateItem() http.Handler {
 		session := c.store.DB.Copy()
 		defer session.Close()
 
-		collection := session.DB(c.databaseName).C(ItemsCollection)
+		collection := session.DB(c.databaseName).C(ItemSettingCollection)
 		count, err := collection.Find(bson.M{"code": item.Code}).Count()
 		if err != nil {
 			u.WriteJSONError("verification failed", http.StatusInternalServerError)
@@ -94,7 +94,7 @@ func (c *Controller) GetItems() http.Handler {
 		defer session.Close()
 
 		var items []Item
-		collection := session.DB(c.databaseName).C(ItemsCollection)
+		collection := session.DB(c.databaseName).C(ItemSettingCollection)
 		err := collection.Find(nil).Sort("description").All(&items)
 		if err != nil {
 			u.WriteJSONError("verification failed", http.StatusInternalServerError)
@@ -121,7 +121,7 @@ func (c *Controller) GetItemByID() http.Handler {
 		defer session.Close()
 
 		var item Item
-		collection := session.DB(c.databaseName).C(ItemsCollection)
+		collection := session.DB(c.databaseName).C(ItemSettingCollection)
 		err := collection.FindId(bson.ObjectIdHex(itemID)).One(&item)
 		if err != nil {
 			u.WriteJSONError("verification failed", http.StatusInternalServerError)

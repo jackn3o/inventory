@@ -1,4 +1,4 @@
-package setting
+package settings
 
 import (
 	"path"
@@ -6,7 +6,7 @@ import (
 	configuration "../../base/configuration"
 	"../../base/connector"
 	base "../../base/service"
-	controller "../../controllers/setting"
+	controller "../../controllers/settings"
 )
 
 // authenticationService is one router service.
