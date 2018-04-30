@@ -11,9 +11,8 @@ type errorResponse struct {
 	Messages interface{} `json:"messages,omitempty"`
 }
 
-type jsonResponseDTO struct {
-	Data  interface{}   `json:"data,omitempty"`
-	Error errorResponse `json:"meta,omitempty"`
+type jsonErrorResponseDTO struct {
+	Error *errorResponse `json:"meta,omitempty"`
 }
 
 // WriteJSON return JSON format data to client, default 200
@@ -22,9 +21,7 @@ func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 	if len(vars) > 0 {
 		statusCode = vars[0]
 	}
-	data, err := json.Marshal(jsonResponseDTO{
-		Data: value,
-	})
+	data, err := json.Marshal(value)
 
 	if err != nil {
 		http.Error(u.Writer, err.Error(), http.StatusInternalServerError)
@@ -42,8 +39,8 @@ func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 
 // WriteJSONError return JSON error to client
 func (u *Utility) WriteJSONError(value interface{}, statusCode int) {
-	errResponse, err := json.Marshal(jsonResponseDTO{
-		Error: errorResponse{
+	errResponse, err := json.Marshal(jsonErrorResponseDTO{
+		Error: &errorResponse{
 			Code:     statusCode,
 			Status:   http.StatusText(statusCode),
 			Messages: value,
