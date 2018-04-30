@@ -1,99 +1,97 @@
 <template>
-    <div>
-        <v-layout fill-height>
-            <v-flex style="overflow:hidden;"
-                    :class="sideMenuClasses"
-                    :hidden-sm-and-down="$route.name !== 'inventory.list'">
-                <v-card tile
-                        height="100%">
-                    <v-toolbar color="grey lighten-4"
-                               flat
-                               prominent
-                               extended>
-                        <v-spacer></v-spacer>
-                        <v-btn icon
-                               @click="isAddNew=true">
-                            <v-icon>add</v-icon>
-                        </v-btn>
-                        <v-btn icon>
-                            <v-icon>more_vert</v-icon>
-                        </v-btn>
-                        <template slot="extension">
-                            <v-text-field v-model="searchKey"
-                                          prepend-icon="search"
-                                          label="search"
-                                          solo-inverted
-                                          flat
-                                          class="mx-3"></v-text-field>
-                        </template>
-                    </v-toolbar>
-                    <v-divider></v-divider>
-                    <v-list>
-                        <v-list-group v-model="category.active"
-                                      v-for="category in filteredItems"
-                                      :key="category.description"
-                                      class="inventory_list_group">
-                            <!-- :prepend-icon="item.action" -->
-                            <!-- <v-subheader inset>
+    <v-layout fill-height>
+        <v-flex style="overflow:hidden;"
+                :class="sideMenuClasses"
+                :hidden-sm-and-down="$route.name !== 'inventory.list'">
+            <v-card tile
+                    height="100%">
+                <v-toolbar color="grey lighten-4"
+                           flat
+                           prominent
+                           extended>
+                    <v-spacer></v-spacer>
+                    <v-btn icon
+                           @click="isAddNew=true">
+                        <v-icon>add</v-icon>
+                    </v-btn>
+                    <v-btn icon>
+                        <v-icon>more_vert</v-icon>
+                    </v-btn>
+                    <template slot="extension">
+                        <v-text-field v-model="searchKey"
+                                      prepend-icon="search"
+                                      label="search"
+                                      solo-inverted
+                                      flat
+                                      class="mx-3"></v-text-field>
+                    </template>
+                </v-toolbar>
+                <v-divider></v-divider>
+                <v-list>
+                    <v-list-group v-model="category.active"
+                                  v-for="category in filteredItems"
+                                  :key="category.description"
+                                  class="inventory_list_group">
+                        <!-- :prepend-icon="item.action" -->
+                        <!-- <v-subheader inset>
                                 <div>Item(s)</div>
                                 <v-spacer></v-spacer>
                                 <div>Balance</div>
                             </v-subheader> -->
-                            <!-- <v-divider inset></v-divider> -->
-                            <v-list-tile slot="activator">
-                                <v-list-tile-content>
-                                    <v-list-tile-title>
-                                        <div class="group_title">
-                                            {{ category.description }}
-                                            <div class="category_count_badge">{{ category.items.length || 0 }}</div>
-                                        </div>
-                                    </v-list-tile-title>
+                        <!-- <v-divider inset></v-divider> -->
+                        <v-list-tile slot="activator">
+                            <v-list-tile-content>
+                                <v-list-tile-title>
+                                    <div class="group_title">
+                                        {{ category.description }}
+                                        <div class="category_count_badge">{{ category.items.length || 0 }}</div>
+                                    </div>
+                                </v-list-tile-title>
 
-                                </v-list-tile-content>
-                            </v-list-tile>
-                            <v-list-tile v-for="item in category.items"
-                                         :key="item.code"
-                                         avatar
-                                         ripple
-                                         @click="select(item.id)">
-                                <v-list-tile-avatar>
-                                    <v-avatar size="34px"
-                                              :class="getAvatarClass(item.color)">
-                                        <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
-                                    </v-avatar>
-                                </v-list-tile-avatar>
-                                <v-list-tile-content>
-                                    <v-list-tile-title class="body-1">
-                                        {{ item.code }} - {{ item.description}}
-                                    </v-list-tile-title>
-                                    <v-list-tile-sub-title>
-                                        {{ item.outlet }}
-                                    </v-list-tile-sub-title>
-                                </v-list-tile-content>
-                                <v-list-tile-action>
-                                    {{ item.balance }}
-                                </v-list-tile-action>
-                            </v-list-tile>
-                        </v-list-group>
-                    </v-list>
-                </v-card>
-                <transition name="slide-x-transition"
-                            enter-class="slide-x150-transition-enter"
-                            leave-to-class="slide-x150-transition-leave-to">
-                    <add-inventory v-if="isAddNew"
-                                   @close="close()"></add-inventory>
-                </transition>
-            </v-flex>
-            <v-flex :class="contentClasses">
-                <transition name="slide-x-reverse-transition"
-                            mode="in-out">
-                    <!-- <transition :name="$route.name == 'inventory:list'? 'slide-x-reverse-transition':'slide-y-reverse-transition'"> -->
-                    <router-view style="z-index:6; overflow:hidden; height:100%; border-left: 1px solid rgba(0,0,0,0.12)">
-                    </router-view>
-                </transition>
-            </v-flex>
-        </v-layout>
-    </div>
+                            </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile v-for="item in category.items"
+                                     :key="item.code"
+                                     avatar
+                                     ripple
+                                     @click="select(item.id)">
+                            <v-list-tile-avatar>
+                                <v-avatar size="34px"
+                                          :class="getAvatarClass(item.color)">
+                                    <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
+                                </v-avatar>
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                                <v-list-tile-title class="body-1">
+                                    {{ item.code }} - {{ item.description}}
+                                </v-list-tile-title>
+                                <v-list-tile-sub-title>
+                                    {{ item.outlet }}
+                                </v-list-tile-sub-title>
+                            </v-list-tile-content>
+                            <v-list-tile-action>
+                                {{ item.balance }}
+                            </v-list-tile-action>
+                        </v-list-tile>
+                    </v-list-group>
+                </v-list>
+            </v-card>
+            <transition name="slide-x-transition"
+                        enter-class="slide-x150-transition-enter"
+                        leave-to-class="slide-x150-transition-leave-to">
+                <add-inventory v-if="isAddNew"
+                               @close="close()"></add-inventory>
+            </transition>
+        </v-flex>
+        <v-flex :class="contentClasses">
+            <transition name="slide-x-reverse-transition"
+                        mode="in-out">
+                <!-- <transition :name="$route.name == 'inventory:list'? 'slide-x-reverse-transition':'slide-y-reverse-transition'"> -->
+                <router-view style="z-index:6; overflow:hidden; height:100%; border-left: 1px solid rgba(0,0,0,0.12)">
+                </router-view>
+            </transition>
+        </v-flex>
+    </v-layout>
 </template>
 
 <script>
