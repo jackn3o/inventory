@@ -35,7 +35,7 @@ func (u *Utility) Unmarshal(value interface{}) (int, error) {
 
 // UnmarshalWithValidation is function to validate parse json from request header
 // Must have a validate function for the provide receiver
-func (u *Utility) UnmarshalWithValidation(value interface{}) error {
+func (u *Utility) UnmarshalWithValidation(value interface{}) interface{} {
 	if _, err := u.Unmarshal(value); err != nil {
 		return err
 	}
@@ -55,7 +55,11 @@ func (u *Utility) UnmarshalWithValidation(value interface{}) error {
 			errWriter.Add(v.Name, v.Err.Error())
 		}
 
-		return errWriter.Errors()
+		// make result in validations object
+		result := make(map[string]interface{})
+		result["validations"] = errWriter.Errors()
+
+		return result
 	}
 
 	return nil

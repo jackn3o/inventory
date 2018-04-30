@@ -6,9 +6,9 @@ import (
 )
 
 type errorResponse struct {
-	Code    int         `json:"code,omitempty"`
-	Status  string      `json:"status,omitempty"`
-	Message interface{} `json:"message,omitempty"`
+	Code     int         `json:"code,omitempty"`
+	Status   string      `json:"status,omitempty"`
+	Messages interface{} `json:"messages,omitempty"`
 }
 
 type jsonResponseDTO struct {
@@ -44,15 +44,17 @@ func (u *Utility) WriteJSON(value interface{}, vars ...int) error {
 func (u *Utility) WriteJSONError(value interface{}, statusCode int) {
 	errResponse, err := json.Marshal(jsonResponseDTO{
 		Error: errorResponse{
-			Code:    statusCode,
-			Status:  http.StatusText(statusCode),
-			Message: value,
+			Code:     statusCode,
+			Status:   http.StatusText(statusCode),
+			Messages: value,
 		},
 	})
 
 	if err != nil {
 		http.Error(u.Writer, err.Error(), http.StatusInternalServerError)
 	} else {
+		u.Writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		u.Writer.WriteHeader(statusCode)
 		u.Writer.Write(errResponse)
 	}
 }

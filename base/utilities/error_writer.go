@@ -29,14 +29,14 @@ func (e *ErrorWriter) Add(key string, value interface{}) {
 }
 
 // Errors method return errors information stored in a map
-func (e *ErrorWriter) Errors() ErrorsInfo {
+func (e *ErrorWriter) Errors() interface{} {
 	if e.errors == nil {
 		return nil
 	}
 	// copy the internal errors' map
-	m := make(map[string]interface{})
+	result := make(map[string]interface{})
 	for key, value := range e.errors {
-		m[key] = value
+		result[key] = value
 	}
-	return m
+	return result
 }
