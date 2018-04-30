@@ -8,8 +8,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Category Model for settings.categories Collection
-type Category struct {
+// Outlet Model for settings.outlets Collection
+type Outlet struct {
 	ID           bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
 	Code         string        `bson:"code" json:"code" valid:"required"`
 	Description  string        `bson:"description" json:"description" valid:"required"`
@@ -19,13 +19,13 @@ type Category struct {
 	ModifiedBy   string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
 }
 
-// CreateCategory in master data
-func (c *Controller) CreateCategory() http.Handler {
+// CreateOutlet in master data
+func (c *Controller) CreateOutlet() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		u := utility.New(writer, req)
 
-		category := &Category{}
-		err := u.UnmarshalWithValidation(category)
+		outlet := &Outlet{}
+		err := u.UnmarshalWithValidation(outlet)
 		if err != nil {
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
@@ -33,8 +33,8 @@ func (c *Controller) CreateCategory() http.Handler {
 		session := c.store.DB.Copy()
 		defer session.Close()
 
-		collection := session.DB(c.databaseName).C(CategorySettingCollection)
-		count, err := collection.Find(bson.M{"code": category.Code}).Count()
+		collection := session.DB(c.databaseName).C(OutletSettingCollection)
+		count, err := collection.Find(bson.M{"code": outlet.Code}).Count()
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
@@ -45,40 +45,40 @@ func (c *Controller) CreateCategory() http.Handler {
 			return
 		}
 
-		category.ID = bson.NewObjectId()
+		outlet.ID = bson.NewObjectId()
 		timeNow := time.Now()
-		category.CreatedDate = &timeNow
-		category.CreatedBy = "todo"
-		err = collection.Insert(category)
+		outlet.CreatedDate = &timeNow
+		outlet.CreatedBy = "todo"
+		err = collection.Insert(outlet)
 
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			panic(err)
 		}
 
-		u.WriteJSON(category.ID, http.StatusCreated)
+		u.WriteJSON(outlet.ID, http.StatusCreated)
 	})
 }
 
-// GetCategories return list of category
-func (c *Controller) GetCategories() http.Handler {
+// GetOutlets return list of outlets
+func (c *Controller) GetOutlets() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		u := utility.New(writer, req)
 		session := c.store.DB.Copy()
 		defer session.Close()
 
-		var categories []Category
-		collection := session.DB(c.databaseName).C(CategorySettingCollection)
+		var outlets []Outlet
+		collection := session.DB(c.databaseName).C(OutletSettingCollection)
 		err := collection.
 			Find(nil).
 			Select(bson.M{"code": 1, "description": 1}).
 			Sort("description").
-			All(&categories)
+			All(&outlets)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
 
-		u.WriteJSON(categories)
+		u.WriteJSON(outlets)
 	})
 }

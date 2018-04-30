@@ -25,4 +25,5 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 const (
 	ItemSettingCollection     = "settings.items"
 	CategorySettingCollection = "settings.categories"
+	OutletSettingCollection   = "settings.outlets"
 )

@@ -9,7 +9,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Item Model for items Collection
+// Item Model for settings.items Collection
 type Item struct {
 	ID             bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
 	Code           string        `bson:"code" json:"code" valid:"required"`

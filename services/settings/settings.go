@@ -46,6 +46,18 @@ func (s *settingService) Create(basePath string, mw ...base.Middleware) []base.E
 			Handler: base.Use(c.CreateCategory(), mw...),
 			Method:  "POST",
 		},
+
+		// outlet
+		base.EndPoint{
+			Path:    path.Join(basePath, "/outlets"),
+			Handler: base.Use(c.GetOutlets(), mw...),
+			Method:  "GET",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/outlets"),
+			Handler: base.Use(c.CreateOutlet(), mw...),
+			Method:  "POST",
+		},
 	}
 }
 
