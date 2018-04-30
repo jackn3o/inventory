@@ -13,7 +13,7 @@
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn icon
-                   @click="addNewInventory">
+                   @click.native="addNewInventory">
                 <v-icon>done</v-icon>
             </v-btn>
             <template slot="extension">
@@ -23,23 +23,29 @@
         <v-card-text>
             <v-text-field v-model="model.code"
                           label="Code"
-                          placeholder="Please describe"></v-text-field>
+                          placeholder="Please describe"
+                          :error-messages="validations.code"></v-text-field>
             <v-text-field v-model="model.description"
                           label="Description"
-                          placeholder="Please describe"></v-text-field>
+                          placeholder="Please describe"
+                          :error-messages="validations.description"></v-text-field>
             <v-text-field v-model="model.color"
                           label="Color"
-                          placeholder="Please describe"></v-text-field>
+                          placeholder="Please describe"
+                          :error-messages="validations.color"></v-text-field>
             <v-text-field v-model="model.openingBalance"
                           type="number"
                           label="Opening Balance"
-                          placeholder="Please describe"></v-text-field>
+                          placeholder="Please describe"
+                          :error-messages="validations.openingBalance"></v-text-field>
         </v-card-text>
     </v-card>
 </template>
 
 <script>
+import validator from '../mixins/validator'
 export default {
+    mixins: [validator],
     data() {
         return {
             model: {
@@ -53,31 +59,15 @@ export default {
     methods: {
         addNewInventory() {
             let vm = this
-            vm.axios
-                .post('/setting/items', vm.model)
+
+            vm
+                .post('/setting/items', this.model)
                 .then(obj_response => {
-                    console.log(obj_response)
+                    vm.$emit('close')
                 })
                 .catch(obj_exception => {
                     console.log(obj_exception)
                 })
-            // let vm = this,
-            //     MockData = require('./../data.js'),
-            //     nb_itemCount = MockData.items.length,
-            //     obj_new = {
-            //         value: false,
-            //         id: '000' + String(nb_itemCount + 1),
-            //         code: vm.code,
-            //         description: vm.description,
-            //         color: vm.color,
-            //         balance: vm.openBalance
-            //     }
-
-            // this.$axios.post
-
-            // MockData.addNewItem(obj_new).then(obj_response => {
-            //     vm.$emit('close')
-            // })
         }
     }
 }
