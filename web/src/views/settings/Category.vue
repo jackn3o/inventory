@@ -26,15 +26,17 @@
                     lg8
                     offset-lg2>
                 <v-list two-line>
-                    <template v-for="i in 5">
+                    <template v-for="item in list">
                         <v-list-tile avatar
-                                     :key="i">
+                                     :key="item.id">
                             <v-list-tile-avatar>
-                                <!-- <img :src="item.avatar"> -->
+                                <v-avatar class="red">
+                                    <span class="white--text headline">{{ item.code }}</span>
+                                </v-avatar>
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                                <v-list-tile-title>{{i}}</v-list-tile-title>
-                                <v-list-tile-sub-title></v-list-tile-sub-title>
+                                <v-list-tile-title>{{item.code}}</v-list-tile-title>
+                                <v-list-tile-sub-title>{{item.description}}</v-list-tile-sub-title>
                             </v-list-tile-content>
                             <v-list-tile-action>
                                 <v-btn icon>
@@ -47,7 +49,7 @@
                                 </v-btn>
                             </v-list-tile-action>
                         </v-list-tile>
-                        <v-divider :key="'d-'+i"></v-divider>
+                        <v-divider :key="'d-'+item.id"></v-divider>
                     </template>
                 </v-list>
             </v-flex>
@@ -98,6 +100,7 @@ export default {
     data() {
         return {
             title: '123',
+            list: [],
             dialog: false,
             model: {
                 code: null,
@@ -122,7 +125,7 @@ export default {
             this.axios
                 .get('/settings/categories')
                 .then(obj_response => {
-                    console.log(obj_response.data)
+                    this.list = obj_response.data
                 })
                 .catch(obj_exception => {})
         }
