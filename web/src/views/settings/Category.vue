@@ -1,59 +1,32 @@
 <template>
     <div>
-        <v-toolbar color="grey lighten-4"
-                   flat
-                   prominent
-                   extended>
-            <v-btn icon
-                   class="hidden-md-and-up"
-                   @click.native="$router.push({name:'inventory.list'})">
-                <v-icon>keyboard_backspace</v-icon>
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn icon>
-                <v-icon class="blue-grey--text text--darken-3">delete</v-icon>
-            </v-btn>
-            <v-btn icon>
-                <v-icon class="blue-grey--text text--darken-3">more_vert</v-icon>
-            </v-btn>
-            <div slot="extension">
-                <v-toolbar-title>{{ title }}</v-toolbar-title>
-            </div>
-        </v-toolbar>
-        <v-divider></v-divider>
-        <v-layout>
-            <v-flex xs12
-                    lg8
-                    offset-lg2>
-                <v-list two-line>
-                    <template v-for="item in list">
-                        <v-list-tile avatar
-                                     :key="item.id">
-                            <v-list-tile-avatar>
-                                <v-avatar class="red">
-                                    <span class="white--text headline">{{ item.code }}</span>
-                                </v-avatar>
-                            </v-list-tile-avatar>
-                            <v-list-tile-content>
-                                <v-list-tile-title>{{item.code}}</v-list-tile-title>
-                                <v-list-tile-sub-title>{{item.description}}</v-list-tile-sub-title>
-                            </v-list-tile-content>
-                            <v-list-tile-action>
-                                <v-btn icon>
-                                    <v-icon>info_outline</v-icon>
-                                </v-btn>
-                            </v-list-tile-action>
-                            <v-list-tile-action>
-                                <v-btn icon>
-                                    <v-icon>delete</v-icon>
-                                </v-btn>
-                            </v-list-tile-action>
-                        </v-list-tile>
-                        <v-divider :key="'d-'+item.id"></v-divider>
-                    </template>
-                </v-list>
-            </v-flex>
-        </v-layout>
+        <v-list two-line>
+            <template v-for="item in list">
+                <v-list-tile avatar
+                             :key="item.id">
+                    <v-list-tile-avatar>
+                        <v-avatar class="red">
+                            <span class="white--text headline">{{ item.code }}</span>
+                        </v-avatar>
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                        <v-list-tile-title>{{item.code}}</v-list-tile-title>
+                        <v-list-tile-sub-title>{{item.description}}</v-list-tile-sub-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action>
+                        <v-btn icon>
+                            <v-icon>info_outline</v-icon>
+                        </v-btn>
+                    </v-list-tile-action>
+                    <v-list-tile-action>
+                        <v-btn icon>
+                            <v-icon>delete</v-icon>
+                        </v-btn>
+                    </v-list-tile-action>
+                </v-list-tile>
+                <v-divider :key="'d-'+item.id"></v-divider>
+            </template>
+        </v-list>
         <v-btn v-if="!dialog"
                color="pink"
                dark
@@ -116,6 +89,7 @@ export default {
                 .post('/settings/categories', vm.model)
                 .then(obj_response => {
                     vm.dialog = false
+                    vm.load()
                 })
                 .catch(obj_exception => {
                     vm.dialog = false
