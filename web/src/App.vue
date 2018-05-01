@@ -15,13 +15,7 @@
                                              hide-overlay
                                              :mini-variant="mini"
                                              v-model="drawer"
-                                             style="z-index:5;">
-                            <!-- <v-toolbar flat
-                                       class="transparent">
-                                <v-list class="pa-0">
-
-                                </v-list>
-                            </v-toolbar> -->
+                                             style="display:flex; flex-direction:column; z-index:5; padding-bottom:0;">
                             <v-list class="pt-0">
                                 <v-list-tile>
                                     <v-list-tile-action>
@@ -41,17 +35,11 @@
                                     </v-list-tile-action>
                                 </v-list-tile>
                                 <v-divider></v-divider>
-                                <v-list-tile avatar>
-                                    <v-list-tile-avatar>
-                                        <img src="https://randomuser.me/api/portraits/men/85.jpg">
-                                    </v-list-tile-avatar>
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>John Leider</v-list-tile-title>
-                                    </v-list-tile-content>
-                                </v-list-tile>
+
                                 <v-list-tile>
                                     <v-list-tile-action>
-                                        <v-btn icon>
+                                        <v-btn icon
+                                               @click.native="$router.push({name: 'inventory.list'})">
                                             <v-icon>storage</v-icon>
                                         </v-btn>
                                     </v-list-tile-action>
@@ -61,12 +49,24 @@
                                 </v-list-tile>
                                 <v-list-tile>
                                     <v-list-tile-action>
-                                        <v-btn icon>
+                                        <v-btn icon
+                                               @click.native="$router.push({name: 'settings'})">
                                             <v-icon>settings</v-icon>
                                         </v-btn>
                                     </v-list-tile-action>
                                     <v-list-tile-content>
                                         <v-list-tile-title>Setting</v-list-tile-title>
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                            </v-list>
+                            <v-spacer></v-spacer>
+                            <v-list>
+                                <v-list-tile avatar>
+                                    <v-list-tile-avatar>
+                                        <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                                    </v-list-tile-avatar>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>John Leider</v-list-tile-title>
                                     </v-list-tile-content>
                                 </v-list-tile>
                             </v-list>
@@ -116,6 +116,7 @@ html {
 .inner_body {
     height: 100vh;
     width: 100vw;
+    background:#888;
     /* background: url('./assets/background.jpg')no-repeat center center fixed; */
 }
 .relative {
