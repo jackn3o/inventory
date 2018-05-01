@@ -23,7 +23,8 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 
 // Key for collection
 const (
-	ItemSettingCollection     = "settings.items"
+	ItemSettingCollection     = "settings.items" // main setting
 	CategorySettingCollection = "settings.categories"
+	ColorSettingCollection    = "settings.colors"
 	OutletSettingCollection   = "settings.outlets"
 )
