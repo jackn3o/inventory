@@ -41,21 +41,33 @@ const routes = [
       {
         path: '/settings/category',
         name: 'settings.category',
+        meta: {
+          title: 'Category',
+        },
         component: Category
       },
       {
         path: '/settings/color',
         name: 'settings.color',
+        meta: {
+          title: 'Color',
+        },
         component: Color
       },
       {
         path: '/settings/item',
         name: 'settings.item',
+        meta: {
+          title: 'Item',
+        },
         component: Item
       },
       {
         path: '/settings/outlet',
         name: 'settings.outlet',
+        meta: {
+          title: 'Outlet',
+        },
         component: Outlet
       }
     ]
