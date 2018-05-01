@@ -160,12 +160,18 @@ export default {
     },
     methods: {
         load() {
-            let vm = this,
-                MockData = require('./../data.js')
+            this.axios
+                .get('/settings/items')
+                .then(obj_response => {
+                    this.list = obj_response.data
+                })
+                .catch(obj_exception => {})
+            // let vm = this,
+            //     MockData = require('./../data.js')
 
-            MockData.getInventory().then(obj_response => {
-                vm.list = obj_response
-            })
+            // MockData.getInventory().then(obj_response => {
+            //     vm.list = obj_response
+            // })
         },
         close() {
             this.load()
