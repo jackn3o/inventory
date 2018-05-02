@@ -44,13 +44,13 @@
                       :items="categories"
                       item-value="_id"
                       item-text="description"></v-select>
-            <v-select v-model="model.outlet"
+            <!-- <v-select v-model="model.outlet"
                       label="Outlet"
                       placeholder="Please select"
                       autocomplete
                       :items="outlets"
                       item-value="_id"
-                      item-text="description"></v-select>
+                      item-text="description"></v-select> -->
         </v-card-text>
     </v-card>
 </template>
@@ -63,7 +63,7 @@ export default {
         return {
             colors: null,
             categories: null,
-            outlets: null,
+            // outlets: null,
             model: {
                 code: null,
                 description: null,
@@ -94,12 +94,12 @@ export default {
                 })
                 .catch(obj_exception => {})
 
-            this.axios
-                .get('/settings/outlets')
-                .then(obj_response => {
-                    this.outlets = obj_response.data
-                })
-                .catch(obj_exception => {})
+            // this.axios
+            //     .get('/settings/outlets')
+            //     .then(obj_response => {
+            //         this.outlets = obj_response.data
+            //     })
+            //     .catch(obj_exception => {})
 
             this.axios
                 .get('/settings/colors')
