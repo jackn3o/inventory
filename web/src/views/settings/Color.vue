@@ -49,7 +49,8 @@
                                   :error-messages="validations.description"></v-text-field>
                     <v-text-field v-model="model.hex"
                                   label="Hex Code"
-                                  placeholder="Please describe"
+                                  placeholder="hex color code"
+                                  prefix="#"
                                   :error-messages="validations.hex"></v-text-field>
                 </v-card-text>
                 <v-card-actions>
@@ -92,7 +93,6 @@ export default {
                     vm.load()
                 })
                 .catch(obj_exception => {
-                    vm.dialog = false
                 })
         },
         load() {

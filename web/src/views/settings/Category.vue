@@ -92,7 +92,6 @@ export default {
                     vm.load()
                 })
                 .catch(obj_exception => {
-                    vm.dialog = false
                 })
         },
         load() {

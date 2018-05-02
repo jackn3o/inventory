@@ -91,9 +91,7 @@ export default {
                     vm.dialog = false
                     vm.load()
                 })
-                .catch(obj_exception => {
-                    vm.dialog = false
-                })
+                .catch(obj_exception => {})
         },
         load() {
             this.axios
