@@ -11,7 +11,7 @@ import (
 
 // ItemDetail model for items.details Collection
 type ItemDetail struct {
-	ID              bson.ObjectId `bson:"_id,omitempty" json:"_id,omitempty" valid:"-"`
+	ID              bson.ObjectId `bson:"id,omitempty" json:"id,omitempty" valid:"-"`
 	DocumentNo      string        `bson:"documentNo,omitempty" json:"documentNo,omitempty" valid:"-"`
 	BatchNo         string        `bson:"batchNo,omitempty" json:"batchNo,omitempty" valid:"-"`
 	Date            *time.Time    `bson:"date,omitempty" json:"date,omitempty" valid:"-"`
@@ -23,6 +23,13 @@ type ItemDetail struct {
 	CreatedBy       string        `bson:"createBy,omitempty" json:"createBy,omitempty" valid:"-"`
 	ModifiedDate    *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
 	ModifiedBy      string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
+}
+
+// DetailResponseDto model
+type DetailResponseDto struct {
+	Code        string        `bson:"code" json:"code" valid:"required"`
+	Description string        `bson:"description" json:"description" valid:"required"`
+	Details     []*ItemDetail `bson:"details,omitempty" json:"details,omitempty" valid:"-"`
 }
 
 // AddDetail to item
@@ -61,8 +68,8 @@ func (c *Controller) AddDetail() http.Handler {
 	})
 }
 
-// GetItemDetailByID ...
-func (c *Controller) GetItemDetailByID() http.Handler {
+// GetItemDetailsByID ...
+func (c *Controller) GetItemDetailsByID() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		u := utility.New(writer, req)
 
@@ -76,20 +83,18 @@ func (c *Controller) GetItemDetailByID() http.Handler {
 		session := c.store.DB.Copy()
 		defer session.Close()
 
-		var detail []*ItemDetail
+		var dto DetailResponseDto
 		collection := session.DB(c.databaseName).C(ItemsCollection)
-
 		err := collection.
 			FindId(bson.ObjectIdHex(itemID)).
-			Select(bson.M{"details": 1}).
-			Sort("-date").
-			All(&detail)
+			Select(bson.M{"code": 1, "description": 1, "details": 1}).
+			One(&dto)
 
 		if err != nil {
-			u.WriteJSONError("verification failed", http.StatusInternalServerError)
+			u.WriteJSONError("Something wrong, please try again later", http.StatusInternalServerError)
 			return
 		}
 
-		u.WriteJSON(detail)
+		u.WriteJSON(dto)
 	})
 }

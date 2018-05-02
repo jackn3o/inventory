@@ -80,7 +80,7 @@
                     <v-radio-group v-model="inOrOut"
                                    row
                                    hide-details
-                                   class="pt-0">
+                                   class="pt-0 separator_before">
                         <v-radio label="In"
                                  value="in"></v-radio>
                         <v-radio label="Out"
@@ -109,7 +109,7 @@
                                               v-model="formattedDate"
                                               prepend-icon="event"
                                               readonly></v-text-field>
-                                <v-date-picker v-model="date"
+                                <v-date-picker v-model="model.date"
                                                @input="$refs.menu2.save(date)"></v-date-picker>
 
                             </v-menu>
@@ -126,7 +126,8 @@
                                 md6
                                 class="pr-3">
                             <v-text-field v-model="model.documentNo"
-                                          label="Document Number"></v-text-field>
+                                          label="Document Number"
+                                          placeholder="Document number"></v-text-field>
 
                         </v-flex>
                         <v-flex xs12
@@ -134,7 +135,8 @@
                                 class="pl-3">
                             <v-text-field v-show="inOrOut == 'in'"
                                           v-model="model.batchNo"
-                                          label="Batch Number"></v-text-field>
+                                          label="Batch Number"
+                                          placeholder="Batch number"></v-text-field>
                         </v-flex>
                         <v-flex xs12
                                 md6
@@ -152,9 +154,14 @@
                                 class="pl-3">
                             <v-text-field v-model="model.unitCost"
                                           type="number"
-                                          label="Cost"></v-text-field>
+                                          label="Unit Cost"
+                                          placeholder="Cost per unit"></v-text-field>
                         </v-flex>
-
+                        <v-flex xs12>
+                            <v-text-field multi-line
+                                          label="Remark"
+                                          placeholder="Please describe"></v-text-field>
+                        </v-flex>
                     </v-layout>
                 </v-card-text>
 
@@ -176,6 +183,7 @@
 export default {
     data() {
         return {
+            title: null,
             date: null,
             menu2: false,
             tabs: null,
@@ -184,7 +192,6 @@ export default {
             inOrOut: 'in',
             search: null,
             details: [],
-            currentItem: {},
             pagingSetting: [10, 20, 30, { text: 'All', value: -1 }],
             model: {
                 documentNo: null,
@@ -219,11 +226,11 @@ export default {
             return arr_header
         },
         formattedDate() {
-            if (!this.date) {
+            if (!this.model.date) {
                 return null
             }
 
-            return this.$moment(this.date).format('DD/MMMM/YYYY')
+            return this.$moment(this.model.date).format('DD/MMMM/YYYY')
         },
         currentViewportSize() {
             return this.$store.getters.currentViewportSize
@@ -236,10 +243,6 @@ export default {
         },
         currentId() {
             return this.$route.params.id
-        },
-        title() {
-            return ''
-            // return this.currentItem.code + ' - ' + this.currentItem.description
         }
     },
     methods: {
@@ -248,21 +251,16 @@ export default {
                 obj_result = {}
 
             vm.axios
-                .get(`/items/${vm.currentId}/details`)
+                .get(`/items/${vm.currentId}`)
                 .then(obj_response => {
                     if (!obj_response || !obj_response.data) {
                         return
-
-                        vm.currentItem = obj_response.data
                     }
+
+                    vm.title = obj_response.data.code + ' - ' + obj_response.data.description
+                    vm.details = obj_response.data.details || []
                 })
                 .catch(obj_exception => {})
-
-            //     MockData = require('./../data.js'),
-
-            // MockData.getInventoryById(vm.currentId).then(obj_response => {
-            //     vm.currentItem = obj_response
-            // })
         },
         addDetail() {},
         load() {
@@ -290,5 +288,16 @@ export default {
 </script>
 
 <style>
-
+.separator_before {
+    position: relative;
+}
+.separator_before::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 10%;
+    width: 1px;
+    height: 80%;
+    background: rgba(0, 0, 0, 0.11);
+}
 </style>
