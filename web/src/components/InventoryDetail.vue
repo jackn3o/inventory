@@ -23,22 +23,15 @@
                     slider-color="black"
                     color="transparent"
                     style="margin-top:18px;">
-                <v-tab v-for="n in 3"
-                       :key="n">
-                    Item {{ n }}
+                <v-tab key="0">
+                    All
+                </v-tab>
+                <v-tab v-for="outlet in outlets"
+                       :key="outlet._id">
+                    {{ outlet.description }}
                 </v-tab>
             </v-tabs>
         </v-toolbar>
-        <v-tabs-items v-model="tabs">
-            <v-tab-item v-for="n in 3"
-                        :key="n">
-                <v-card>
-                    <v-card-text>
-                        tab {{ n }}
-                    </v-card-text>
-                </v-card>
-            </v-tab-item>
-        </v-tabs-items>
         <v-divider></v-divider>
         <v-card-text>
             <v-data-table :headers="headers"
@@ -111,8 +104,9 @@
                                     min-width="290px"
                                     :return-value.sync="date">
                                 <v-text-field slot="activator"
-                                              label="Picker without buttons"
-                                              v-model="date"
+                                              label="Date"
+                                              placeholder="Select Date"
+                                              v-model="formattedDate"
                                               prepend-icon="event"
                                               readonly></v-text-field>
                                 <v-date-picker v-model="date"
@@ -185,6 +179,7 @@ export default {
             date: null,
             menu2: false,
             tabs: null,
+            outlets: null,
             dialog: false,
             inOrOut: 'in',
             search: null,
@@ -215,6 +210,13 @@ export default {
         }
     },
     computed: {
+        formattedDate() {
+            if (!this.date) {
+                return null
+            }
+
+            return this.$moment(this.date).format('DD/MMMM/YYYY')
+        },
         currentViewportSize() {
             return this.$store.getters.currentViewportSize
         },
@@ -246,6 +248,13 @@ export default {
         load() {
             let vm = this,
                 MockData = require('./../data.js')
+
+            this.axios
+                .get('/settings/outlets')
+                .then(obj_response => {
+                    this.outlets = obj_response.data
+                })
+                .catch(obj_exception => {})
 
             this.getCurrentItem()
             MockData.getInventoryDetailById(vm.currentId).then(obj_response => {
