@@ -1,4 +1,4 @@
-package settings
+package items
 
 import (
 	configuration "../../base/configuration"
@@ -23,7 +23,5 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 
 // Key for collection
 const (
-	CategorySettingCollection = "settings.categories"
-	ColorSettingCollection    = "settings.colors"
-	OutletSettingCollection   = "settings.outlets"
+	ItemsCollection = "items" // main setting
 )

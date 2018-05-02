@@ -1,24 +1,23 @@
-package settings
+package items
 
 import (
 	"net/http"
 	"time"
 
 	utility "../../base/utilities"
-	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Item Model for settings.items Collection
+// Item Model for items Collection
 type Item struct {
 	ID           bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
 	Code         string        `bson:"code" json:"code" valid:"required"`
 	Description  string        `bson:"description" json:"description" valid:"required"`
-	Balance      int           `bson:"balance" json:"balance,string" valid:"-"`
-	Cost         int           `bson:"cost" json:"cost" valid:"-"`
-	Color        string        `bson:"color,omitempty" json:"color" valid:"-"`
 	Category     string        `bson:"category,omitempty" json:"category" valid:"-"`
-	Outlet       string        `bson:"outlet,omitempty" json:"outlet" valid:"-"`
+	Color        string        `bson:"color,omitempty" json:"color" valid:"-"`
+	UnitCost     int           `bson:"unitCost" json:"unitCost" valid:"-"`
+	Balance      int           `bson:"balance" json:"balance,string" valid:"-"`
+	Details      []*ItemDetail `bson:"details,omitempty" json:"details,omitempty" valid:"-"`
 	CreatedDate  *time.Time    `bson:"createdDate" json:"createdDate,omitempty" valid:"-"`
 	CreatedBy    string        `bson:"createBy" json:"createBy,omitempty" valid:"-"`
 	ModifiedDate *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
@@ -39,7 +38,7 @@ func (c *Controller) CreateItem() http.Handler {
 		session := c.store.DB.Copy()
 		defer session.Close()
 
-		collection := session.DB(c.databaseName).C(ItemSettingCollection)
+		collection := session.DB(c.databaseName).C(ItemsCollection)
 		count, err := collection.Find(bson.M{"code": item.Code}).Count()
 		if err != nil {
 			u.WriteJSONError("verification failed", http.StatusInternalServerError)
@@ -74,40 +73,17 @@ func (c *Controller) GetItems() http.Handler {
 		defer session.Close()
 
 		var items []Item
-		collection := session.DB(c.databaseName).C(ItemSettingCollection)
-		err := collection.Find(nil).Sort("description").All(&items)
+		collection := session.DB(c.databaseName).C(ItemsCollection)
+		err := collection.
+			Find(nil).
+			Select(bson.M{"_id": 1, "color": 1, "code": 1, "description": 1, "category": 1}).
+			Sort("description").
+			All(&items)
 		if err != nil {
 			u.WriteJSONError("verification failed", http.StatusInternalServerError)
 			return
 		}
 
 		u.WriteJSON(items)
-	})
-}
-
-// GetItemByID ...
-func (c *Controller) GetItemByID() http.Handler {
-	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
-		u := utility.New(writer, req)
-
-		itemID := mux.Vars(req)["id"]
-
-		if len(itemID) <= 0 {
-			u.WriteJSONError("ID is require", http.StatusBadRequest)
-			return
-		}
-
-		session := c.store.DB.Copy()
-		defer session.Close()
-
-		var item Item
-		collection := session.DB(c.databaseName).C(ItemSettingCollection)
-		err := collection.FindId(bson.ObjectIdHex(itemID)).One(&item)
-		if err != nil {
-			u.WriteJSONError("verification failed", http.StatusInternalServerError)
-			return
-		}
-
-		u.WriteJSON(item)
 	})
 }
