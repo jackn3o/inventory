@@ -9,6 +9,7 @@ import Login from '@/components/Login'
 import SettingList from '@/views/settings/List.vue'
 import Category from '@/views/settings/Category.vue'
 import Color from '@/views/settings/Color.vue'
+import Cost from '@/views/settings/Cost.vue'
 import Item from '@/views/settings/Item.vue'
 import Outlet from '@/views/settings/Outlet.vue'
 // router, routes, auth guard
@@ -42,7 +43,7 @@ const routes = [
         path: '/settings/category',
         name: 'settings.category',
         meta: {
-          title: 'Category',
+          title: 'Category'
         },
         component: Category
       },
@@ -50,15 +51,23 @@ const routes = [
         path: '/settings/color',
         name: 'settings.color',
         meta: {
-          title: 'Color',
+          title: 'Color'
         },
         component: Color
+      },
+      {
+        path: '/settings/cost',
+        name: 'settings.cost',
+        meta: {
+          title: 'Cost'
+        },
+        component: Cost
       },
       {
         path: '/settings/item',
         name: 'settings.item',
         meta: {
-          title: 'Item',
+          title: 'Item'
         },
         component: Item
       },
@@ -66,7 +75,7 @@ const routes = [
         path: '/settings/outlet',
         name: 'settings.outlet',
         meta: {
-          title: 'Outlet',
+          title: 'Outlet'
         },
         component: Outlet
       }

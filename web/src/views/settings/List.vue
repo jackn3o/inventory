@@ -56,6 +56,10 @@ export default {
                     title: 'Color',
                     to: 'settings.color'
                 },
+                {
+                    title: 'Cost',
+                    to: 'settings.cost'
+                },
                 // {
                 //     title: 'Item',
                 //     to: 'settings.item'
