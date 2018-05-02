@@ -54,7 +54,7 @@ func (c *Controller) CreateCategory() http.Handler {
 
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
-			panic(err)
+			return
 		}
 
 		u.WriteJSON(category.ID, http.StatusCreated)
