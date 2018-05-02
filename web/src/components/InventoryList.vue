@@ -28,33 +28,25 @@
                 </v-toolbar>
                 <v-divider></v-divider>
                 <v-list>
-                    <v-list-group v-model="category.active"
-                                  v-for="category in filteredItems"
+                    <v-list-group v-for="category in categories"
+                                  v-model="category.active"
                                   :key="category.description"
                                   class="inventory_list_group">
-                        <!-- :prepend-icon="item.action" -->
-                        <!-- <v-subheader inset>
-                                <div>Item(s)</div>
-                                <v-spacer></v-spacer>
-                                <div>Balance</div>
-                            </v-subheader> -->
-                        <!-- <v-divider inset></v-divider> -->
                         <v-list-tile slot="activator">
                             <v-list-tile-content>
                                 <v-list-tile-title>
                                     <div class="group_title">
                                         {{ category.description }}
-                                        <div class="category_count_badge">{{ category.items.length || 0 }}</div>
+                                        <div class="category_count_badge">{{ list.filter(obj_item=> { return obj_item.category == category._id}).length || 0 }}</div>
                                     </div>
                                 </v-list-tile-title>
-
                             </v-list-tile-content>
                         </v-list-tile>
-                        <v-list-tile v-for="item in category.items"
+                        <v-list-tile v-for="item in list.filter(obj_item=> { return obj_item.category == category._id})"
                                      :key="item.code"
                                      avatar
                                      ripple
-                                     @click="select(item.id)">
+                                     @click="select(item._id)">
                             <v-list-tile-avatar>
                                 <v-avatar size="34px"
                                           :class="getAvatarClass(item.color)">
@@ -103,6 +95,7 @@ export default {
     data() {
         return {
             searchKey: null,
+            categories: null,
             list: [],
             isShow2ndLevel: false, // for computed,
             isAddNew: false
@@ -160,6 +153,20 @@ export default {
     },
     methods: {
         load() {
+            this.axios
+                .get('/settings/categories')
+                .then(obj_response => {
+                    if (!obj_response || !obj_response.data) {
+                        return
+                    }
+
+                    this.categories = obj_response.data
+                    // .map(obj_data => {
+                    //     return { description: obj_data.description, active: false }
+                    // })
+                })
+                .catch(obj_exception => {})
+
             this.axios
                 .get('/settings/items')
                 .then(obj_response => {
