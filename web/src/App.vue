@@ -113,10 +113,13 @@ export default {
 html {
     overflow: hidden;
 }
+html .application {
+    font-family: 'Noto Sans', 'Roboto', sans-serif;
+}
 .inner_body {
     height: 100vh;
     width: 100vw;
-    background:#888;
+    background: #888;
     /* background: url('./assets/background.jpg')no-repeat center center fixed; */
 }
 .relative {
