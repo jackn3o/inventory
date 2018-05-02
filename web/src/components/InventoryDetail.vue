@@ -9,6 +9,7 @@
                    @click.native="$router.push({name:'inventory.list'})">
                 <v-icon>keyboard_backspace</v-icon>
             </v-btn>
+            <v-toolbar-title>{{ title }}</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn icon>
                 <v-icon class="blue-grey--text text--darken-3">delete</v-icon>
@@ -16,10 +17,28 @@
             <v-btn icon>
                 <v-icon class="blue-grey--text text--darken-3">more_vert</v-icon>
             </v-btn>
-            <div slot="extension">
-                <v-toolbar-title>{{ title }}</v-toolbar-title>
-            </div>
+            <v-tabs slot="extension"
+                    centered
+                    v-model="tabs"
+                    slider-color="black"
+                    color="transparent"
+                    style="margin-top:18px;">
+                <v-tab v-for="n in 3"
+                       :key="n">
+                    Item {{ n }}
+                </v-tab>
+            </v-tabs>
         </v-toolbar>
+        <v-tabs-items v-model="tabs">
+            <v-tab-item v-for="n in 3"
+                        :key="n">
+                <v-card>
+                    <v-card-text>
+                        tab {{ n }}
+                    </v-card-text>
+                </v-card>
+            </v-tab-item>
+        </v-tabs-items>
         <v-divider></v-divider>
         <v-card-text>
             <v-data-table :headers="headers"
@@ -50,13 +69,112 @@
                 </v-alert>
             </v-data-table>
         </v-card-text>
-        <v-btn color="pink"
+        <v-btn v-if="!dialog"
+               color="pink"
                dark
                absolute
                fab
-               style="bottom: 16px; right: 16px;">
+               style="bottom: 16px; right: 16px;"
+               @click.native="dialog=true">
             <v-icon>add</v-icon>
         </v-btn>
+        <v-dialog v-model="dialog"
+                  max-width="500px">
+            <v-card class="pa-3">
+                <v-card-title class="title">
+                    Inventory Adjustment
+                    <v-spacer></v-spacer>
+                    <v-radio-group v-model="inOrOut"
+                                   row
+                                   hide-details
+                                   class="pt-0">
+                        <v-radio label="In"
+                                 value="in"></v-radio>
+                        <v-radio label="Out"
+                                 value="out"></v-radio>
+                    </v-radio-group>
+                </v-card-title>
+                <v-card-text>
+                    <v-layout row
+                              wrap>
+                        <v-flex xs12
+                                md6
+                                class="pr-3">
+                            <v-menu ref="menu2"
+                                    lazy
+                                    :close-on-content-click="false"
+                                    v-model="menu2"
+                                    transition="scale-transition"
+                                    offset-y
+                                    full-width
+                                    :nudge-right="40"
+                                    min-width="290px"
+                                    :return-value.sync="date">
+                                <v-text-field slot="activator"
+                                              label="Picker without buttons"
+                                              v-model="date"
+                                              prepend-icon="event"
+                                              readonly></v-text-field>
+                                <v-date-picker v-model="date"
+                                               @input="$refs.menu2.save(date)"></v-date-picker>
+
+                            </v-menu>
+                        </v-flex>
+                        <v-flex xs12
+                                md6
+                                class="pl-3">
+                            <v-text-field v-model="model.outlet"
+                                          label="Outlet"
+                                          placeholder="Select Outlet"
+                                          hint="optional"></v-text-field>
+                        </v-flex>
+                        <v-flex xs12
+                                md6
+                                class="pr-3">
+                            <v-text-field v-model="model.documentNo"
+                                          label="Document Number"></v-text-field>
+
+                        </v-flex>
+                        <v-flex xs12
+                                md6
+                                class="pl-3">
+                            <v-text-field v-show="inOrOut == 'in'"
+                                          v-model="model.batchNo"
+                                          label="Batch Number"></v-text-field>
+                        </v-flex>
+                        <v-flex xs12
+                                md6
+                                class="pr-3">
+                            <v-text-field v-if="inOrOut == 'in'"
+                                          label="IN"
+                                          placeholder="In Stock"></v-text-field>
+                            <v-text-field v-if="inOrOut== 'out'"
+                                          label="OUT"
+                                          placeholder="Out Stock"></v-text-field>
+                        </v-flex>
+
+                        <v-flex xs12
+                                md6
+                                class="pl-3">
+                            <v-text-field v-model="model.unitCost"
+                                          type="number"
+                                          label="Cost"></v-text-field>
+                        </v-flex>
+
+                    </v-layout>
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary"
+                           flat
+                           @click.stop="dialog=false">Close</v-btn>
+                    <v-btn color="primary"
+                           flat
+                           @click.stop="addDetail">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -64,6 +182,11 @@
 export default {
     data() {
         return {
+            date: null,
+            menu2: false,
+            tabs: null,
+            dialog: false,
+            inOrOut: 'in',
             search: null,
             headers: [
                 { text: 'Document No', align: 'left', sortable: true, value: 'documentNo' },
@@ -78,7 +201,17 @@ export default {
             ],
             details: [],
             currentItem: {},
-            pagingSetting: [10, 20, 30, { text: 'All', value: -1 }]
+            pagingSetting: [10, 20, 30, { text: 'All', value: -1 }],
+            model: {
+                documentNo: null,
+                batchNo: null,
+                outlet: null,
+                date: null,
+                unitCost: null,
+                in: null,
+                out: null,
+                remark: null
+            }
         }
     },
     computed: {
@@ -95,7 +228,8 @@ export default {
             return this.$route.params.id
         },
         title() {
-            return this.currentItem.code + ' - ' + this.currentItem.description
+            return ''
+            // return this.currentItem.code + ' - ' + this.currentItem.description
         }
     },
     methods: {
@@ -108,6 +242,7 @@ export default {
                 vm.currentItem = obj_response
             })
         },
+        addDetail() {},
         load() {
             let vm = this,
                 MockData = require('./../data.js')
