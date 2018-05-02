@@ -11,17 +11,18 @@ import (
 
 // Item Model for settings.items Collection
 type Item struct {
-	ID             bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
-	Code           string        `bson:"code" json:"code" valid:"required"`
-	Description    string        `bson:"description" json:"description" valid:"required"`
-	OpeningBalance int           `bson:"openingBalance" json:"openingBalance,string" valid:"required"`
-	Color          string        `bson:"color,omitempty" json:"color" valid:"-"`
-	Category       string        `bson:"category,omitempty" json:"category" valid:"-"`
-	Outlet         string        `bson:"outlet,omitempty" json:"outlet" valid:"-"`
-	CreatedDate    *time.Time    `bson:"createdDate" json:"createdDate" valid:"-"`
-	CreatedBy      string        `bson:"createBy" json:"createBy" valid:"-"`
-	ModifiedDate   *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate" valid:"-"`
-	ModifiedBy     string        `bson:"modifiedBy,omitempty" json:"modifiedBy" valid:"-"`
+	ID           bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
+	Code         string        `bson:"code" json:"code" valid:"required"`
+	Description  string        `bson:"description" json:"description" valid:"required"`
+	Balance      int           `bson:"balance" json:"balance,string" valid:"-"`
+	Cost         int           `bson:"cost" json:"cost" valid:"-"`
+	Color        string        `bson:"color,omitempty" json:"color" valid:"-"`
+	Category     string        `bson:"category,omitempty" json:"category" valid:"-"`
+	Outlet       string        `bson:"outlet,omitempty" json:"outlet" valid:"-"`
+	CreatedDate  *time.Time    `bson:"createdDate" json:"createdDate,omitempty" valid:"-"`
+	CreatedBy    string        `bson:"createBy" json:"createBy,omitempty" valid:"-"`
+	ModifiedDate *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
+	ModifiedBy   string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
 }
 
 // CreateItem in master data
