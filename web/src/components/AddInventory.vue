@@ -29,11 +29,7 @@
                           label="Description"
                           placeholder="Please describe"
                           :error-messages="validations.description"></v-text-field>
-            <v-text-field v-model="model.openingBalance"
-                          type="number"
-                          label="Opening Balance"
-                          placeholder="Please describe"
-                          :error-messages="validations.openingBalance"></v-text-field>
+
             <v-select v-model="model.color"
                       label="Color"
                       placeholder="Please select"
@@ -73,8 +69,7 @@ export default {
                 description: null,
                 category: null,
                 outlet: null,
-                color: null,
-                openingBalance: null
+                color: null
             }
         }
     },
