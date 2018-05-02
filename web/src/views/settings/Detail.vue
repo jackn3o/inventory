@@ -38,7 +38,6 @@
 export default {
     data() {
         return {
-            title: '123',
             searchKey: null
         }
     }

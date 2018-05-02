@@ -81,7 +81,6 @@ export default {
     mixins: [validator],
     data() {
         return {
-            title: '123',
             list: [],
             dialog: false,
             model: {
