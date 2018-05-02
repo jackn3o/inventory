@@ -5,12 +5,13 @@ import (
 	"time"
 
 	utility "../../base/utilities"
+	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // Category Model for settings.categories Collection
 type Category struct {
-	ID           bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
+	ID           bson.ObjectId `bson:"_id,omitempty" json:"_id,omitempty" valid:"-"`
 	Code         string        `bson:"code" json:"code" valid:"required"`
 	Description  string        `bson:"description" json:"description" valid:"required"`
 	CreatedDate  *time.Time    `bson:"createdDate,omitempty" json:"createdDate,omitempty" valid:"-"`
@@ -64,6 +65,15 @@ func (c *Controller) CreateCategory() http.Handler {
 func (c *Controller) GetCategories() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		u := utility.New(writer, req)
+		vars := mux.Vars(req)
+		sortParam := "description"
+		sortAscending, ok := vars["ascending"]
+		if ok {
+			if sortAscending == "false" {
+				sortParam = "-description"
+			}
+		}
+
 		session := c.store.DB.Copy()
 		defer session.Close()
 
@@ -72,7 +82,7 @@ func (c *Controller) GetCategories() http.Handler {
 		err := collection.
 			Find(nil).
 			Select(bson.M{"code": 1, "description": 1}).
-			Sort("description").
+			Sort(sortParam).
 			All(&categories)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
