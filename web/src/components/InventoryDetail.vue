@@ -42,7 +42,7 @@
                           slot-scope="props">
                     <td>{{ props.item.documentNo }}</td>
                     <td>{{ props.item.batchNo }}</td>
-                    <td>{{ props.item.outlet }}</td>
+                    <td v-if="tab !== 0">{{ props.item.outlet }}</td>
                     <td>{{ $moment(props.item.date).format('DD/MMM/YYYY') }}</td>
                     <td>{{ props.item.unitCost.toFixed(2) }}</td>
                     <td class="text-xs-right green--text">{{ props.item.in }}</td>
@@ -183,17 +183,6 @@ export default {
             dialog: false,
             inOrOut: 'in',
             search: null,
-            headers: [
-                { text: 'Document No', align: 'left', sortable: true, value: 'documentNo' },
-                { text: 'Batch No', align: 'left', sortable: true, value: 'batchNo' },
-                { text: 'Outlet', align: 'left', sortable: true, value: 'outlet' },
-                { text: 'Date', align: 'left', sortable: true, value: 'date' },
-                { text: 'Cost', align: 'left', sortable: true, value: 'unitCost' },
-                { text: 'In', align: 'right', sortable: true, value: 'in' },
-                { text: 'Out', align: 'right', sortable: true, value: 'out' },
-                { text: 'Balance Quantity', align: 'right', sortable: true, value: 'balanceQuantity' },
-                { text: '', align: 'center', sortable: false, value: 'remark' }
-            ],
             details: [],
             currentItem: {},
             pagingSetting: [10, 20, 30, { text: 'All', value: -1 }],
@@ -210,6 +199,25 @@ export default {
         }
     },
     computed: {
+        headers() {
+            let arr_header = [
+                    { text: 'Document No', align: 'left', sortable: true, value: 'documentNo' },
+                    { text: 'Batch No', align: 'left', sortable: true, value: 'batchNo' },
+                    { text: 'Date', align: 'left', sortable: true, value: 'date' },
+                    { text: 'Cost', align: 'left', sortable: true, value: 'unitCost' },
+                    { text: 'In', align: 'right', sortable: true, value: 'in' },
+                    { text: 'Out', align: 'right', sortable: true, value: 'out' },
+                    { text: 'Balance Quantity', align: 'right', sortable: true, value: 'balanceQuantity' },
+                    { text: '', align: 'center', sortable: false, value: 'remark' }
+                ],
+                obj_outletHeader = { text: 'Outlet', align: 'left', sortable: true, value: 'outlet' }
+
+            if (this.tabs == '0') {
+                arr_header.splice(2, 0, obj_outletHeader)
+            }
+
+            return arr_header
+        },
         formattedDate() {
             if (!this.date) {
                 return null
@@ -237,34 +245,42 @@ export default {
     methods: {
         getCurrentItem() {
             let vm = this,
-                MockData = require('./../data.js'),
                 obj_result = {}
 
-            MockData.getInventoryById(vm.currentId).then(obj_response => {
-                vm.currentItem = obj_response
-            })
-        },
-        addDetail() {},
-        load() {
-            let vm = this,
-                MockData = require('./../data.js')
-
-            this.axios
-                .get('/settings/outlets')
+            vm.axios
+                .get(`/items/${vm.currentId}/details`)
                 .then(obj_response => {
-                    this.outlets = obj_response.data
+                    if (!obj_response || !obj_response.data) {
+                        return
+
+                        vm.currentItem = obj_response.data
+                    }
                 })
                 .catch(obj_exception => {})
 
-            this.getCurrentItem()
-            MockData.getInventoryDetailById(vm.currentId).then(obj_response => {
-                vm.details = obj_response
-            })
+            //     MockData = require('./../data.js'),
+
+            // MockData.getInventoryById(vm.currentId).then(obj_response => {
+            //     vm.currentItem = obj_response
+            // })
+        },
+        addDetail() {},
+        load() {
+            let vm = this
+
+            vm.axios
+                .get('/settings/outlets')
+                .then(obj_response => {
+                    vm.outlets = obj_response.data
+                })
+                .catch(obj_exception => {})
+
+            vm.getCurrentItem()
         }
     },
     watch: {
         currentId() {
-            this.load()
+            this.getCurrentItem()
         }
     },
     mounted() {

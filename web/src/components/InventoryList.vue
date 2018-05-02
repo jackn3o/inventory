@@ -168,7 +168,7 @@ export default {
                 .catch(obj_exception => {})
 
             this.axios
-                .get('/settings/items')
+                .get('/items')
                 .then(obj_response => {
                     this.list = obj_response.data
                 })

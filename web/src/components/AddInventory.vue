@@ -78,7 +78,7 @@ export default {
             let vm = this
 
             vm
-                .post('/settings/items', this.model)
+                .post('/items', this.model)
                 .then(obj_response => {
                     vm.$emit('close')
                 })
