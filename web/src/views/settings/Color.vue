@@ -3,7 +3,7 @@
         <v-list two-line>
             <template v-for="item in list">
                 <v-list-tile avatar
-                             :key="item.id">
+                             :key="item._id">
                     <v-list-tile-avatar>
                         <v-avatar class="red">
                             <span class="white--text headline">{{ item.code }}</span>
@@ -24,7 +24,7 @@
                         </v-btn>
                     </v-list-tile-action>
                 </v-list-tile>
-                <v-divider :key="'d-'+item.id"></v-divider>
+                <v-divider :key="'d-'+item._id"></v-divider>
             </template>
         </v-list>
         <v-btn v-if="!dialog"
@@ -73,7 +73,6 @@ export default {
     mixins: [validator],
     data() {
         return {
-            title: '123',
             list: [],
             dialog: false,
             model: {
@@ -92,8 +91,7 @@ export default {
                     vm.dialog = false
                     vm.load()
                 })
-                .catch(obj_exception => {
-                })
+                .catch(obj_exception => {})
         },
         load() {
             this.axios
