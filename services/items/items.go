@@ -32,14 +32,14 @@ func (s *itemService) Create(basePath string, mw ...base.Middleware) []base.EndP
 
 		// details
 		base.EndPoint{
-			Path:    path.Join(basePath, "/items/{id}/details"),
-			Handler: base.Use(c.AddDetail(), mw...),
-			Method:  "POST",
-		},
-		base.EndPoint{
 			Path:    path.Join(basePath, "/{id}"),
 			Handler: base.Use(c.GetItemDetailsByID(), mw...),
 			Method:  "GET",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/{id}/details"),
+			Handler: base.Use(c.AddDetail(), mw...),
+			Method:  "POST",
 		},
 	}
 }

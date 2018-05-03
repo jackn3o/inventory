@@ -10,18 +10,19 @@ import (
 
 // Item Model for items Collection
 type Item struct {
-	ID           bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
-	Code         string        `bson:"code" json:"code" valid:"required"`
-	Description  string        `bson:"description" json:"description" valid:"required"`
-	Category     string        `bson:"category,omitempty" json:"category" valid:"-"`
-	Color        string        `bson:"color,omitempty" json:"color" valid:"-"`
-	UnitCost     int           `bson:"unitCost" json:"unitCost" valid:"-"`
-	Balance      int           `bson:"balance" json:"balance,string" valid:"-"`
-	Details      []*ItemDetail `bson:"details,omitempty" json:"details,omitempty" valid:"-"`
-	CreatedDate  *time.Time    `bson:"createdDate" json:"createdDate,omitempty" valid:"-"`
-	CreatedBy    string        `bson:"createBy" json:"createBy,omitempty" valid:"-"`
-	ModifiedDate *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
-	ModifiedBy   string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
+	ID              bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
+	Code            string        `bson:"code" json:"code" valid:"required"`
+	Description     string        `bson:"description" json:"description" valid:"required"`
+	Category        string        `bson:"category,omitempty" json:"category" valid:"-"`
+	Color           string        `bson:"color,omitempty" json:"color" valid:"-"`
+	UnitCost        float64       `bson:"unitCost" json:"unitCost" valid:"-"`
+	BalanceQuantity int           `bson:"balanceQuantity" json:"balanceQuantity" valid:"-"`
+	BalanceCost     float64       `bson:"balanceCost" json:"balanceCost" valid:"-"`
+	Details         []*ItemDetail `bson:"details,omitempty" json:"details,omitempty" valid:"-"`
+	CreatedDate     *time.Time    `bson:"createdDate" json:"createdDate,omitempty" valid:"-"`
+	CreatedBy       string        `bson:"createBy" json:"createBy,omitempty" valid:"-"`
+	ModifiedDate    *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
+	ModifiedBy      string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
 }
 
 // CreateItem in master data

@@ -11,18 +11,20 @@ import (
 
 // ItemDetail model for items.details Collection
 type ItemDetail struct {
-	ID              bson.ObjectId `bson:"id,omitempty" json:"id,omitempty" valid:"-"`
-	DocumentNo      string        `bson:"documentNo,omitempty" json:"documentNo,omitempty" valid:"-"`
-	BatchNo         string        `bson:"batchNo,omitempty" json:"batchNo,omitempty" valid:"-"`
-	Date            *time.Time    `bson:"date,omitempty" json:"date,omitempty" valid:"-"`
-	UnitCost        float64       `bson:"unitCost,omitempty" json:"unitCost,string,omitempty" valid:"-"`
-	In              float32       `bson:"in,omitempty" json:"in,string,omitempty" valid:"-"`
-	Out             float32       `bson:"out,omitempty" json:"out,string,omitempty" valid:"-"`
-	BalanceQuantity float32       `bson:"balanceQuantity,omitempty" json:"balanceQuantity,omitempty" valid:"-"`
-	CreatedDate     *time.Time    `bson:"createdDate,omitempty" json:"createdDate,omitempty" valid:"-"`
-	CreatedBy       string        `bson:"createBy,omitempty" json:"createBy,omitempty" valid:"-"`
-	ModifiedDate    *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
-	ModifiedBy      string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
+	ID           bson.ObjectId `bson:"id,omitempty" json:"id,omitempty" valid:"-"`
+	OutletID     bson.ObjectId `bson:"outletId,omitempty" json:"outletId,omitempty" valid:"-"`
+	DocumentNo   string        `bson:"documentNo,omitempty" json:"documentNo,omitempty" valid:"-"`
+	BatchNo      string        `bson:"batchNo,omitempty" json:"batchNo,omitempty" valid:"-"`
+	Date         *time.Time    `bson:"date,omitempty" json:"date,omitempty" valid:"-"`
+	In           int           `bson:"in" json:"in,string" valid:"-"`
+	Out          int           `bson:"out" json:"out,string" valid:"-"`
+	UnitPrice    float64       `bson:"unitPrice" json:"unitPrice,string" valid:"-"`
+	TotalCost    float64       `bson:"totalCost,omitempty" json:"totalCost,string,omitempty" valid:"-"`
+	TotalSales   float64       `bson:"totalSales,omitempty" json:"totalSales,string,omitempty" valid:"-"` // only for out
+	CreatedDate  *time.Time    `bson:"createdDate,omitempty" json:"createdDate,omitempty" valid:"-"`
+	CreatedBy    string        `bson:"createBy,omitempty" json:"createBy,omitempty" valid:"-"`
+	ModifiedDate *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
+	ModifiedBy   string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
 }
 
 // DetailResponseDto model
@@ -30,6 +32,13 @@ type DetailResponseDto struct {
 	Code        string        `bson:"code" json:"code" valid:"required"`
 	Description string        `bson:"description" json:"description" valid:"required"`
 	Details     []*ItemDetail `bson:"details,omitempty" json:"details,omitempty" valid:"-"`
+}
+
+// CostAndBalance model
+type CostAndBalance struct {
+	UnitCost        float64 `bson:"unitCost" json:"unitCost" valid:"-"`
+	BalanceQuantity int     `bson:"balanceQuantity" json:"balanceQuantity" valid:"-"`
+	BalanceCost     float64 `bson:"balanceCost" json:"balanceCost" valid:"-"`
 }
 
 // AddDetail to item
@@ -55,14 +64,22 @@ func (c *Controller) AddDetail() http.Handler {
 
 		collection := session.DB(c.databaseName).C(ItemsCollection)
 
-		item := bson.M{"_id": itemID}
-		record := bson.M{"$push": bson.M{"details": detail}}
+		target := bson.M{"_id": bson.ObjectIdHex(itemID)}
+		data := bson.M{"$push": bson.M{"details": detail}}
 
-		err = collection.Update(item, record)
+		err = collection.Update(target, data)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
+
+		var costAndBalance CostAndBalance
+		err = collection.
+			FindId(bson.ObjectIdHex(itemID)).
+			Select(bson.M{"unitCost": 1, "balance": 1}).
+			One(&costAndBalance)
+
+		lastestCostAndBalance := calculateCostAndBalance(costAndBalance, detail)
 
 		u.WriteJSON("success", http.StatusCreated)
 	})
@@ -97,4 +114,33 @@ func (c *Controller) GetItemDetailsByID() http.Handler {
 
 		u.WriteJSON(dto)
 	})
+}
+
+func calculateCostAndBalance(costAndBalance CostAndBalance, detail *ItemDetail) CostAndBalance {
+
+	lastUnitCost := costAndBalance.UnitCost
+	lastBalanceQuantity := costAndBalance.BalanceQuantity
+	lastBalanceCost := costAndBalance.BalanceCost
+
+	currentQuantity := 0
+	isIn := detail.In > 0
+
+	if isIn {
+		currentQuantity = detail.In
+		detail.TotalCost = detail.UnitPrice * float64(currentQuantity)
+
+	} else {
+		currentQuantity = detail.Out
+		detail.TotalCost = lastUnitCost * float64(currentQuantity)
+		detail.TotalSales = detail.UnitPrice * float64(currentQuantity)
+
+	}
+
+	lastestCostAndBalance := CostAndBalance{
+		UnitCost:        lastBalanceCost / float64(lastBalanceQuantity),
+		BalanceCost:     lastBalanceCost + detail.TotalCost,
+		BalanceQuantity: lastBalanceQuantity + currentQuantity,
+	}
+
+	return lastestCostAndBalance
 }
