@@ -110,17 +110,20 @@
                                               prepend-icon="event"
                                               readonly></v-text-field>
                                 <v-date-picker v-model="model.date"
-                                               @input="$refs.menu2.save(date)"></v-date-picker>
+                                               @input="$refs.menu2.save($date)"></v-date-picker>
 
                             </v-menu>
                         </v-flex>
                         <v-flex xs12
                                 md6
                                 class="pl-3">
-                            <v-text-field v-model="model.outlet"
-                                          label="Outlet"
-                                          placeholder="Select Outlet"
-                                          hint="optional"></v-text-field>
+                            <v-select v-model="model.outlet"
+                                      label="Outlet"
+                                      placeholder="Please select"
+                                      autocomplete
+                                      :items="outlets"
+                                      item-value="_id"
+                                      item-text="description"></v-select>
                         </v-flex>
                         <v-flex xs12
                                 md6
@@ -142,9 +145,11 @@
                                 md6
                                 class="pr-3">
                             <v-text-field v-if="inOrOut == 'in'"
+                                          v-model="model.in"
                                           label="IN"
                                           placeholder="In Stock"></v-text-field>
                             <v-text-field v-if="inOrOut== 'out'"
+                                          v-model="model.out"
                                           label="OUT"
                                           placeholder="Out Stock"></v-text-field>
                         </v-flex>
@@ -158,7 +163,8 @@
                                           placeholder="Cost per unit"></v-text-field>
                         </v-flex>
                         <v-flex xs12>
-                            <v-text-field multi-line
+                            <v-text-field v-model="model.remark"
+                                          multi-line
                                           label="Remark"
                                           placeholder="Please describe"></v-text-field>
                         </v-flex>
@@ -180,7 +186,9 @@
 </template>
 
 <script>
+import validator from '../mixins/validator'
 export default {
+    mixins: [validator],
     data() {
         return {
             title: null,
@@ -262,7 +270,18 @@ export default {
                 })
                 .catch(obj_exception => {})
         },
-        addDetail() {},
+        addDetail() {
+            let vm = this
+            vm.model.date = vm.$moment(vm.model.date)
+            vm
+                .post(`/items/${vm.currentId}/details`, vm.model)
+                .then(obj_response => {
+                    if (!obj_response || !obj_response.data) {
+                        return
+                    }
+                })
+                .catch(obj_exception => {})
+        },
         load() {
             let vm = this
 
