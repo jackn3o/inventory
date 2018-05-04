@@ -23,7 +23,7 @@
                     slider-color="black"
                     color="transparent"
                     style="margin-top:18px;">
-                <v-tab key="0">
+                <v-tab key="all">
                     All
                 </v-tab>
                 <v-tab v-for="outlet in outlets"
@@ -36,18 +36,18 @@
         <v-card-text>
             <v-data-table :headers="headers"
                           :items="details"
-                          :search="search"
                           :rows-per-page-items="pagingSetting">
+                <!-- :search="search" -->
                 <template slot="items"
                           slot-scope="props">
                     <td>{{ props.item.documentNo }}</td>
                     <td>{{ props.item.batchNo }}</td>
-                    <td v-if="tab !== 0">{{ props.item.outlet }}</td>
+                    <td v-if="tabs !== 'all'">{{ props.item.outletId || '' }}</td>
                     <td>{{ $moment(props.item.date).format('DD/MMM/YYYY') }}</td>
-                    <td>{{ props.item.unitCost.toFixed(2) }}</td>
+                    <td>{{ props.item.unitCost }}</td>
                     <td class="text-xs-right green--text">{{ props.item.in }}</td>
                     <td class="text-xs-right red--text">{{ props.item.out }}</td>
-                    <td class="text-xs-right">{{ props.item.balanceQuantity }}</td>
+                    <td class="text-xs-right">{{ props.item.balanceQuantity || ''}}</td>
                     <td class="text-xs-center">
                         <v-icon color="red"
                                 v-if="props.item.remark">announcement
@@ -73,7 +73,8 @@
         </v-btn>
         <v-dialog v-model="dialog"
                   max-width="500px">
-            <v-card class="pa-3">
+            <v-card class="pa-3"
+                    v-if="dialog">
                 <v-card-title class="title">
                     Inventory Adjustment
                     <v-spacer></v-spacer>
@@ -93,10 +94,10 @@
                         <v-flex xs12
                                 md6
                                 class="pr-3">
-                            <v-menu ref="menu2"
+                            <v-menu ref="datepicker"
                                     lazy
                                     :close-on-content-click="false"
-                                    v-model="menu2"
+                                    v-model="datepicker"
                                     transition="scale-transition"
                                     offset-y
                                     full-width
@@ -110,7 +111,7 @@
                                               prepend-icon="event"
                                               readonly></v-text-field>
                                 <v-date-picker v-model="model.date"
-                                               @input="$refs.menu2.save($date)"></v-date-picker>
+                                               @input="$refs.datepicker.save($date)"></v-date-picker>
 
                             </v-menu>
                         </v-flex>
@@ -193,7 +194,7 @@ export default {
         return {
             title: null,
             date: null,
-            menu2: false,
+            datepicker: false,
             tabs: null,
             outlets: null,
             dialog: false,
@@ -215,6 +216,9 @@ export default {
         }
     },
     computed: {
+        details2() {
+            return this.details
+        },
         headers() {
             let arr_header = [
                     { text: 'Document No', align: 'left', sortable: true, value: 'documentNo' },
@@ -280,6 +284,8 @@ export default {
                     if (!obj_response || !obj_response.data) {
                         return
                     }
+
+                    vm.dialog = false
                 })
                 .catch(obj_exception => {})
         },
