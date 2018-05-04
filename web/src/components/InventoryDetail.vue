@@ -207,6 +207,7 @@ export default {
                 outlet: null,
                 date: null,
                 unitCost: null,
+                sellingPrice: null,
                 in: null,
                 out: null,
                 remark: null

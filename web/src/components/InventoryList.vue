@@ -170,7 +170,7 @@ export default {
             this.axios
                 .get('/items')
                 .then(obj_response => {
-                    this.list = obj_response.data
+                    this.list = obj_response.data || []
                 })
                 .catch(obj_exception => {})
             // let vm = this,

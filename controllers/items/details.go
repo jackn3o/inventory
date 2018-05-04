@@ -16,10 +16,11 @@ type ItemDetail struct {
 	DocumentNo   string        `bson:"documentNo,omitempty" json:"documentNo,omitempty" valid:"-"`
 	BatchNo      string        `bson:"batchNo,omitempty" json:"batchNo,omitempty" valid:"-"`
 	Date         *time.Time    `bson:"date,omitempty" json:"date,omitempty" valid:"-"`
-	In           int           `bson:"in" json:"in,string" valid:"-"`
-	Out          int           `bson:"out" json:"out,string" valid:"-"`
-	UnitPrice    float64       `bson:"unitPrice" json:"unitPrice,string" valid:"-"`
+	In           int           `bson:"in,omitempty" json:"in,string" valid:"-"`
+	UnitCost     float64       `bson:"unitCost,omitempty" json:"unitCost,string" valid:"-"`
 	TotalCost    float64       `bson:"totalCost,omitempty" json:"totalCost,string,omitempty" valid:"-"`
+	Out          int           `bson:"out,omitempty" json:"out,string" valid:"-"`
+	UnitPrice    float64       `bson:"unitPrice,omitempty" json:"unitPrice,string" valid:"-"`             // only for out
 	TotalSales   float64       `bson:"totalSales,omitempty" json:"totalSales,string,omitempty" valid:"-"` // only for out
 	CreatedDate  *time.Time    `bson:"createdDate,omitempty" json:"createdDate,omitempty" valid:"-"`
 	CreatedBy    string        `bson:"createBy,omitempty" json:"createBy,omitempty" valid:"-"`
@@ -63,23 +64,28 @@ func (c *Controller) AddDetail() http.Handler {
 		defer session.Close()
 
 		collection := session.DB(c.databaseName).C(ItemsCollection)
+		var costAndBalance CostAndBalance
+		err = collection.
+			FindId(bson.ObjectIdHex(itemID)).
+			Select(bson.M{"unitCost": 1, "balanceQuantity": 1, "balanceCost": 1}).
+			One(&costAndBalance)
 
-		target := bson.M{"_id": bson.ObjectIdHex(itemID)}
-		data := bson.M{"$push": bson.M{"details": detail}}
+		lastestCostAndBalance := calculateCostAndBalance(costAndBalance, detail)
 
-		err = collection.Update(target, data)
+		selector := bson.M{"_id": bson.ObjectIdHex(itemID)}
+		updator := bson.M{
+			"$set": bson.M{
+				"unitCost":        lastestCostAndBalance.UnitCost,
+				"balanceQuantity": lastestCostAndBalance.BalanceQuantity,
+				"balanceCost":     lastestCostAndBalance.BalanceCost},
+			"$push": bson.M{"details": detail},
+		}
+
+		err = collection.Update(selector, updator)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
-
-		var costAndBalance CostAndBalance
-		err = collection.
-			FindId(bson.ObjectIdHex(itemID)).
-			Select(bson.M{"unitCost": 1, "balance": 1}).
-			One(&costAndBalance)
-
-		lastestCostAndBalance := calculateCostAndBalance(costAndBalance, detail)
 
 		u.WriteJSON("success", http.StatusCreated)
 	})
@@ -127,7 +133,7 @@ func calculateCostAndBalance(costAndBalance CostAndBalance, detail *ItemDetail) 
 
 	if isIn {
 		currentQuantity = detail.In
-		detail.TotalCost = detail.UnitPrice * float64(currentQuantity)
+		detail.TotalCost = detail.UnitCost * float64(currentQuantity)
 
 	} else {
 		currentQuantity = detail.Out
@@ -137,7 +143,7 @@ func calculateCostAndBalance(costAndBalance CostAndBalance, detail *ItemDetail) 
 	}
 
 	lastestCostAndBalance := CostAndBalance{
-		UnitCost:        lastBalanceCost / float64(lastBalanceQuantity),
+		UnitCost:        (lastUnitCost * float64(lastBalanceQuantity)) + (detail.UnitCost * float64(currentQuantity)),
 		BalanceCost:     lastBalanceCost + detail.TotalCost,
 		BalanceQuantity: lastBalanceQuantity + currentQuantity,
 	}
