@@ -3,13 +3,12 @@ import * as types from '../mutation_types'
 const state = {
     queue: [],
     timeout: 2000,
-    queueTimeout: 2000,
     toast: null
 }
 
 const getters = {
     toastQueue: state => state.queue,
-    toastTimeout: state => state.timedout,
+    toastTimeout: state => state.timeout,
     toast: state => state.toast
 }
 
@@ -28,7 +27,7 @@ const mutations = {
 
             setTimeout(() => {
                 state.toast = null
-            }, state.queueTimeout - 50)
+            }, state.timeout - 20)
         }
     },
 
@@ -61,21 +60,18 @@ const actions = {
         toast._id = Date.now()
         commit(types.PUSH_TOAST, toast)
     },
-    showToast({ commit }) {
-        commit(types.SHIFT_TOAST)
-    },
     // dismiss current active toast
     dismissToast({ commit }) {
         commit(types.RESET_TOAST)
     },
 
-    // // should called once
-    // // start calling toast
-    // startToaster({ commit }) {
-    //     setInterval(() => {
-    //         commit(POP_TOAST)
-    //     }, 500)
-    // }
+    // should called once
+    // start calling toast
+    startToaster({ commit }) {
+        setInterval(() => {
+            commit(types.SHIFT_TOAST)
+        }, 500)
+    }
 }
 
 export default {

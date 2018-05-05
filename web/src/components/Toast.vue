@@ -1,6 +1,6 @@
 <template>
-    <v-snackbar :timeout="toastTimeout"
-                :color="toast.type"
+    <!-- :timeout="toastTimeout" -->
+    <v-snackbar :color="toast.type"
                 :bottom="true"
                 :right="true"
                 auto-height
@@ -14,11 +14,6 @@
 
 <script>
 export default {
-    data() {
-        return {
-            test: false
-        }
-    },
     computed: {
         toast() {
             return this.$store.getters.toast || {}
@@ -27,21 +22,16 @@ export default {
             return this.$store.getters.toastTimeout
         },
         show() {
-            if (!this.$store.getters.toastQueue && !this.toast) {
-                return false
-            }
-
-            this.showToast()
-            return true
+            return this.$store.getters.toast !== null
         }
     },
     methods: {
-        showToast() {
-            this.$store.dispatch('showToast')
-        },
         dismissToast() {
             this.$store.dispatch('dismissToast')
         }
+    },
+    created() {
+        this.$store.dispatch('startToaster')
     }
 }
 </script>
