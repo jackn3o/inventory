@@ -42,7 +42,7 @@ func (c *Controller) CreateItem() http.Handler {
 		collection := session.DB(c.databaseName).C(ItemsCollection)
 		count, err := collection.Find(bson.M{"code": item.Code}).Count()
 		if err != nil {
-			u.WriteJSONError("verification failed", http.StatusInternalServerError)
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
 
