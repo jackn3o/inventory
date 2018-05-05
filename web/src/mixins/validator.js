@@ -64,6 +64,17 @@ const mixin = {
       }).catch(obj_error => {
         return this.handleValidation(obj_error)
       })
+    },
+    put(str_url, obj_data = null) {
+      this.resetValidation()
+
+      return this.axios({
+        method: 'put',
+        url: str_url,
+        data: obj_data
+      }).catch(obj_error => {
+        return this.handleValidation(obj_error)
+      })
     }
   },
   created() {
