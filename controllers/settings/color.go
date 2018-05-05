@@ -71,7 +71,7 @@ func (c *Controller) GetColors() http.Handler {
 		collection := session.DB(c.databaseName).C(ColorSettingCollection)
 		err := collection.
 			Find(nil).
-			Select(bson.M{"code": 1, "description": 1}).
+			Select(bson.M{"code": 1, "description": 1, "hex": 1}).
 			Sort("description").
 			All(&colors)
 		if err != nil {

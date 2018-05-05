@@ -28,7 +28,7 @@
                 </v-toolbar>
                 <v-divider></v-divider>
                 <v-list>
-                    <v-list-group v-for="category in categories"
+                    <!-- <v-list-group v-for="category in categories"
                                   v-model="category.active"
                                   :key="category.description"
                                   class="inventory_list_group">
@@ -41,17 +41,29 @@
                                     </div>
                                 </v-list-tile-title>
                             </v-list-tile-content>
-                        </v-list-tile>
+                        </v-list-tile> -->
+                    <template v-for="category in categories">
+                        <v-subheader :key="category._id">
+                            {{ category.description }}
+                            <v-spacer></v-spacer>
+                            <div class="category_count_badge">{{ list.filter(obj_item=> { return obj_item.category == category._id}).length || 0 }}</div>
+                        </v-subheader>
                         <v-list-tile v-for="item in list.filter(obj_item=> { return obj_item.category == category._id})"
                                      :key="item.code"
                                      avatar
                                      ripple
+                                     :value="item._id == currentId"
+                                     :class="[item._id == currentId? 'grey lighten-4':'']"
                                      @click="select(item._id)">
                             <v-list-tile-avatar>
                                 <v-avatar size="34px"
-                                          :class="getAvatarClass(item.color)">
+                                          tile
+                                          color="#000000"
+                                          :style="getAvatarStyle(item.color)">
                                     <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
                                 </v-avatar>
+                                <!-- <div :style="getAvatarStyle(item.color)"
+                                     style="height:40px;width:40px;"></div> -->
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                                 <v-list-tile-title class="body-1">
@@ -65,7 +77,8 @@
                                 {{ item.balance }}
                             </v-list-tile-action>
                         </v-list-tile>
-                    </v-list-group>
+                    </template>
+                    <!-- </v-list-group> -->
                 </v-list>
             </v-card>
             <transition name="slide-x-transition"
@@ -88,6 +101,7 @@
 
 <script>
 import AddInventory from './AddInventory.vue'
+
 export default {
     components: {
         AddInventory
@@ -96,12 +110,17 @@ export default {
         return {
             searchKey: null,
             categories: null,
+            colors: null,
             list: [],
             isShow2ndLevel: false, // for computed,
             isAddNew: false
         }
     },
     computed: {
+        currentId() {
+            return this.$route.params.id || ''
+        },
+
         filteredItems() {
             let vm = this
             if (!vm.searchKey) {
@@ -168,11 +187,27 @@ export default {
                 .catch(obj_exception => {})
 
             this.axios
+                .get('/settings/colors')
+                .then(obj_response => {
+                    if (!obj_response || !obj_response.data) {
+                        return
+                    }
+
+                    this.colors = obj_response.data
+                    // .map(obj_data => {
+                    //     return { description: obj_data.description, active: false }
+                    // })
+                })
+                .catch(obj_exception => {})
+
+            this.axios
                 .get('/items')
                 .then(obj_response => {
                     this.list = obj_response.data || []
+                    this.setActiveCategories()
                 })
                 .catch(obj_exception => {})
+
             // let vm = this,
             //     MockData = require('./../data.js')
 
@@ -189,19 +224,23 @@ export default {
 
             this.$router.push({ name: 'inventory.detail', params: { id: str_id } })
         },
-        getAvatarClass(color) {
-            if (!color) {
-                return ['grey', 'lighten-2']
-            }
-            let str_color = color.toLowerCase(),
-                obj_class = {
-                    border: str_color == 'white',
-                    'white--text': str_color !== 'white'
+        getAvatarStyle(str_colorId) {
+            let vm = this
+            if (!vm.colors || !str_colorId) {
+                return {
+                    backgroundColor: '#90A4AE !important',
+                    color: '#000'
                 }
+            }
 
-            obj_class[str_color] = str_color
+            let str_hex = vm.colors.find(obj_color => {
+                return obj_color._id == str_colorId
+            }).hex
 
-            return obj_class
+            return {
+                backgroundColor: '#' + str_hex,
+                color: '#000'
+            }
         },
         isStringContain(value, key) {
             if (!value || !key) {
@@ -216,6 +255,21 @@ export default {
             }
 
             return false
+        },
+        setActiveCategories() {
+            let vm = this
+            if (!vm.list || vm.currentId) {
+                return ''
+            }
+
+            let obj_result = vm.list.find(obj_item => {
+                obj_item.category == vm.currentId
+            })
+            if (obj_result) {
+                vm.categories.find(obj_category => {
+                    obj_category._id == vm.currentId
+                })['active'] = true
+            }
         }
     },
     mounted() {

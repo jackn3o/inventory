@@ -22,8 +22,9 @@
                     v-model="tabs"
                     slider-color="black"
                     color="transparent"
-                    style="margin-top:18px;">
-                <v-tab key="all">
+                    style="margin-top:18px;"
+                    @input="changeTab">
+                <v-tab key="0">
                     All
                 </v-tab>
                 <v-tab v-for="outlet in outlets"
@@ -40,14 +41,21 @@
                 <!-- :search="search" -->
                 <template slot="items"
                           slot-scope="props">
-                    <td>{{ props.item.documentNo }}</td>
+                    <td>
+                        <b class="subheading">{{ props.item.documentNo }}</b>
+                        <div v-if="tabs == '0'"
+                             style="font-size:11px;"
+                             class="grey--text lighten-2">{{ getOutletDescription(props.item.outletId) }}</div>
+                    </td>
                     <td>{{ props.item.batchNo }}</td>
-                    <td v-if="tabs !== 'all'">{{ props.item.outletId || '' }}</td>
                     <td>{{ $moment(props.item.date).format('DD/MMM/YYYY') }}</td>
-                    <td>{{ props.item.unitCost }}</td>
-                    <td class="text-xs-right green--text">{{ props.item.in }}</td>
-                    <td class="text-xs-right red--text">{{ props.item.out }}</td>
-                    <td class="text-xs-right">{{ props.item.balanceQuantity || ''}}</td>
+                    <td class="text-xs-right">{{ to2Decimal(props.item.in>0? props.item.unitCost:props.item.sellingPrice) }}</td>
+                    <td class="text-xs-right green--text">{{ hideIfZeroValue(props.item.in) }}</td>
+                    <td class="text-xs-right red--text">{{ hideIfZeroValue(props.item.out) }}</td>
+                    <td v-if="tabs == '0'"
+                        class="text-xs-right">{{ to2Decimal(props.item.utdBalance) }}</td>
+                    <td v-if="tabs == '0'"
+                        class="text-xs-right">{{ to2Decimal(props.item.utdCost) }}</td>
                     <td class="text-xs-center">
                         <v-icon color="red"
                                 v-if="props.item.remark">announcement
@@ -76,18 +84,23 @@
             <v-card class="pa-3"
                     v-if="dialog">
                 <v-card-title class="title">
-                    Inventory Adjustment
-                    <v-spacer></v-spacer>
+                    <v-layout row
+                              wrap>
+                        Inventory Adjustment
+                    </v-layout>
+                </v-card-title>
+                <v-card-text class="grey lighten-4"
+                             style="border-radius:12px;">
                     <v-radio-group v-model="inOrOut"
                                    row
                                    hide-details
-                                   class="pt-0 separator_before">
+                                   class="pt-0">
                         <v-radio label="In"
                                  value="in"></v-radio>
                         <v-radio label="Out"
                                  value="out"></v-radio>
                     </v-radio-group>
-                </v-card-title>
+                </v-card-text>
                 <v-card-text>
                     <v-layout row
                               wrap>
@@ -111,6 +124,7 @@
                                               prepend-icon="event"
                                               readonly></v-text-field>
                                 <v-date-picker v-model="model.date"
+                                               year-icon="mdi-calendar-blank"
                                                @input="$refs.datepicker.save($date)"></v-date-picker>
 
                             </v-menu>
@@ -118,7 +132,7 @@
                         <v-flex xs12
                                 md6
                                 class="pl-3">
-                            <v-select v-model="model.outlet"
+                            <v-select v-model="model.outletId"
                                       label="Outlet"
                                       placeholder="Please select"
                                       autocomplete
@@ -158,10 +172,18 @@
                         <v-flex xs12
                                 md6
                                 class="pl-3">
-                            <v-text-field v-model="model.unitCost"
+                            <v-text-field v-if="inOrOut == 'in'"
+                                          v-model="model.unitCost"
                                           type="number"
                                           label="Unit Cost"
-                                          placeholder="Cost per unit"></v-text-field>
+                                          placeholder="Cost per unit"
+                                          prefix="$"></v-text-field>
+                            <v-text-field v-if="inOrOut == 'out'"
+                                          v-model="model.sellingPrice"
+                                          type="number"
+                                          label="Selling Price"
+                                          placeholder="Price per unit"
+                                          prefix="$"></v-text-field>
                         </v-flex>
                         <v-flex xs12>
                             <v-text-field v-model="model.remark"
@@ -193,9 +215,8 @@ export default {
     data() {
         return {
             title: null,
-            date: null,
             datepicker: false,
-            tabs: null,
+            tabs: '0',
             outlets: null,
             dialog: false,
             inOrOut: 'in',
@@ -205,10 +226,12 @@ export default {
             model: {
                 documentNo: null,
                 batchNo: null,
-                outlet: null,
+                outletId: null,
                 date: null,
                 unitCost: null,
+                utpTotalCost: null,
                 sellingPrice: null,
+                totalSales: null,
                 in: null,
                 out: null,
                 remark: null
@@ -216,24 +239,20 @@ export default {
         }
     },
     computed: {
-        details2() {
-            return this.details
-        },
         headers() {
             let arr_header = [
-                    { text: 'Document No', align: 'left', sortable: true, value: 'documentNo' },
-                    { text: 'Batch No', align: 'left', sortable: true, value: 'batchNo' },
-                    { text: 'Date', align: 'left', sortable: true, value: 'date' },
-                    { text: 'Cost', align: 'left', sortable: true, value: 'unitCost' },
-                    { text: 'In', align: 'right', sortable: true, value: 'in' },
-                    { text: 'Out', align: 'right', sortable: true, value: 'out' },
-                    { text: 'Balance Quantity', align: 'right', sortable: true, value: 'balanceQuantity' },
-                    { text: '', align: 'center', sortable: false, value: 'remark' }
-                ],
-                obj_outletHeader = { text: 'Outlet', align: 'left', sortable: true, value: 'outlet' }
-
-            if (this.tabs == '0') {
-                arr_header.splice(2, 0, obj_outletHeader)
+                { text: 'Document No', align: 'left', sortable: true, value: 'documentNo' },
+                { text: 'Batch No', align: 'left', sortable: true, value: 'batchNo' },
+                { text: 'Date', align: 'left', sortable: true, value: 'date' },
+                { text: 'Cost($)', align: 'right', sortable: true, value: 'unitCost' },
+                { text: 'In', align: 'right', sortable: true, value: 'in' },
+                { text: 'Out', align: 'right', sortable: true, value: 'out' },
+                { text: 'Balance Quantity', align: 'right', value: 'utdBalance' },
+                { text: 'Balance Cost($)', align: 'right', value: 'utdCost' },
+                { text: '', align: 'center', sortable: false, value: 'remark' }
+            ]
+            if (this.tabs !== '0') {
+                this._.pullAt(arr_header, [6, 7])
             }
 
             return arr_header
@@ -259,6 +278,30 @@ export default {
         }
     },
     methods: {
+        changeTab() {
+            console.log(this.tabs)
+        },
+        to2Decimal(value) {
+            return parseFloat(value).toFixed(2) || '0.00'
+        },
+        getOutletDescription(str_id) {
+            let vm = this
+            if (!vm.outlets || !str_id) {
+                return ''
+            }
+
+            return (
+                vm.outlets.find(obj_outlet => {
+                    return obj_outlet._id == str_id
+                }).description || ''
+            )
+        },
+        hideIfZeroValue(value) {
+            if (value == 0) {
+                return ''
+            }
+            return value
+        },
         getCurrentItem() {
             let vm = this,
                 obj_result = {}
@@ -278,6 +321,8 @@ export default {
         addDetail() {
             let vm = this
             vm.model.date = vm.$moment(vm.model.date)
+            vm.model.out = -Math.abs(vm.model.out)
+            vm.model.sellingPrice = -Math.abs(vm.model.sellingPrice)
             vm
                 .post(`/items/${vm.currentId}/details`, vm.model)
                 .then(obj_response => {

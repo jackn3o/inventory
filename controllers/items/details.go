@@ -11,21 +11,24 @@ import (
 
 // ItemDetail model for items.details Collection
 type ItemDetail struct {
-	ID           bson.ObjectId `bson:"id,omitempty" json:"id,omitempty" valid:"-"`
-	OutletID     bson.ObjectId `bson:"outletId,omitempty" json:"outletId,omitempty" valid:"-"`
-	DocumentNo   string        `bson:"documentNo,omitempty" json:"documentNo,omitempty" valid:"-"`
-	BatchNo      string        `bson:"batchNo,omitempty" json:"batchNo,omitempty" valid:"-"`
-	Date         *time.Time    `bson:"date,omitempty" json:"date,omitempty" valid:"-"`
-	In           int           `bson:"in,omitempty" json:"in,string" valid:"-"`
-	UnitCost     float64       `bson:"unitCost,omitempty" json:"unitCost,string" valid:"-"`
-	TotalCost    float64       `bson:"totalCost,omitempty" json:"totalCost,string,omitempty" valid:"-"`
-	Out          int           `bson:"out,omitempty" json:"out,string" valid:"-"`
-	UnitPrice    float64       `bson:"unitPrice,omitempty" json:"unitPrice,string" valid:"-"`             // only for out
-	TotalSales   float64       `bson:"totalSales,omitempty" json:"totalSales,string,omitempty" valid:"-"` // only for out
-	CreatedDate  *time.Time    `bson:"createdDate,omitempty" json:"createdDate,omitempty" valid:"-"`
-	CreatedBy    string        `bson:"createBy,omitempty" json:"createBy,omitempty" valid:"-"`
-	ModifiedDate *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
-	ModifiedBy   string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
+	ID              bson.ObjectId `bson:"id,omitempty" json:"id,omitempty" valid:"-"`
+	OutletID        bson.ObjectId `bson:"outletId,omitempty" json:"outletId,omitempty" valid:"-"`
+	DocumentNo      string        `bson:"documentNo,omitempty" json:"documentNo,omitempty" valid:"-"`
+	BatchNo         string        `bson:"batchNo,omitempty" json:"batchNo,omitempty" valid:"-"`
+	Date            *time.Time    `bson:"date,omitempty" json:"date,omitempty" valid:"-"`
+	In              int           `bson:"in,omitempty" json:"in,string" valid:"-"`
+	UnitCost        float64       `bson:"unitCost,omitempty" json:"unitCost,string" valid:"-"`
+	TotalCost       float64       `bson:"totalCost,omitempty" json:"totalCost,string,omitempty" valid:"-"`
+	Out             int           `bson:"out,omitempty" json:"out" valid:"-"`
+	SellingPrice    float64       `bson:"sellingPrice,omitempty" json:"sellingPrice" valid:"-"`              // only for out
+	TotalSales      float64       `bson:"totalSales,omitempty" json:"totalSales,string,omitempty" valid:"-"` // only for out
+	UpToDateBalance int           `bson:"utdBalance,omitempty" json:"utdBalance,string,omitempty" valid:"-"`
+	UpToDateCost    float64       `bson:"utdCost,omitempty" json:"utdCost,string,omitempty" valid:"-"`
+	Remark          string        `bson:"remark,omitempty" json:"remark,omitempty" valid:"-"`
+	CreatedDate     *time.Time    `bson:"createdDate,omitempty" json:"createdDate,omitempty" valid:"-"`
+	CreatedBy       string        `bson:"createBy,omitempty" json:"createBy,omitempty" valid:"-"`
+	ModifiedDate    *time.Time    `bson:"modifiedDate,omitempty" json:"modifiedDate,omitempty" valid:"-"`
+	ModifiedBy      string        `bson:"modifiedBy,omitempty" json:"modifiedBy,omitempty" valid:"-"`
 }
 
 // DetailResponseDto model
@@ -72,9 +75,12 @@ func (c *Controller) AddDetail() http.Handler {
 
 		lastestCostAndBalance := calculateCostAndBalance(costAndBalance, detail)
 
+		timeNow := time.Now()
 		selector := bson.M{"_id": bson.ObjectIdHex(itemID)}
 		updator := bson.M{
 			"$set": bson.M{
+				"modifiedBy":      "todo",
+				"modifiedDate":    &timeNow,
 				"unitCost":        lastestCostAndBalance.UnitCost,
 				"balanceQuantity": lastestCostAndBalance.BalanceQuantity,
 				"balanceCost":     lastestCostAndBalance.BalanceCost},
@@ -110,7 +116,7 @@ func (c *Controller) GetItemDetailsByID() http.Handler {
 		collection := session.DB(c.databaseName).C(ItemsCollection)
 		err := collection.
 			FindId(bson.ObjectIdHex(itemID)).
-			Select(bson.M{"code": 1, "description": 1, "details": 1}).
+			Select(bson.M{"code": 1, "description": 1, "balanceQuantity": 1, "balanceCost": 1, "details": 1}).
 			One(&dto)
 
 		if err != nil {
@@ -138,15 +144,16 @@ func calculateCostAndBalance(costAndBalance CostAndBalance, detail *ItemDetail) 
 	} else {
 		currentQuantity = detail.Out
 		detail.TotalCost = lastUnitCost * float64(currentQuantity)
-		detail.TotalSales = detail.UnitPrice * float64(currentQuantity)
-
+		detail.TotalSales = detail.SellingPrice * float64(currentQuantity)
 	}
 
-	lastestCostAndBalance := CostAndBalance{
-		UnitCost:        (lastUnitCost * float64(lastBalanceQuantity)) + (detail.UnitCost * float64(currentQuantity)),
-		BalanceCost:     lastBalanceCost + detail.TotalCost,
-		BalanceQuantity: lastBalanceQuantity + currentQuantity,
+	detail.UpToDateCost = lastBalanceCost + detail.TotalCost
+	detail.UpToDateBalance = lastBalanceQuantity + currentQuantity
+	uptoDateCostAndBalance := CostAndBalance{
+		UnitCost:        detail.UpToDateCost / float64(detail.UpToDateBalance),
+		BalanceCost:     detail.UpToDateCost,
+		BalanceQuantity: detail.UpToDateBalance,
 	}
 
-	return lastestCostAndBalance
+	return uptoDateCostAndBalance
 }
