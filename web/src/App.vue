@@ -40,7 +40,7 @@
                                     <v-list-tile-action>
                                         <v-btn icon
                                                @click.native="$router.push({name: 'inventory.list'})">
-                                            <v-icon>storage</v-icon>
+                                            <v-icon>home</v-icon>
                                         </v-btn>
                                     </v-list-tile-action>
                                     <v-list-tile-content>
@@ -76,12 +76,17 @@
                 </v-flex>
             </v-layout>
         </div>
+        <toast></toast>
     </v-app>
 </template>
 
 <script>
+import Toast from './components/Toast.vue'
 export default {
     name: 'App',
+    components: {
+        Toast
+    },
     data() {
         return {
             title: 'Vuetify.js',
@@ -101,7 +106,7 @@ export default {
     },
     methods: {
         onResize() {
-            this.$store.commit('setViewportSize', window.innerWidth)
+            this.$store.dispatch('setViewportSize', window.innerWidth)
         }
     },
     mounted() {
