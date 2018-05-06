@@ -3,23 +3,25 @@
         <v-list two-line>
             <template v-for="item in list">
                 <v-list-tile avatar
+                             dense
                              :key="item._id">
                     <v-list-tile-avatar>
-                        <v-avatar class="red">
-                            <span class="white--text headline">{{ item.code }}</span>
-                        </v-avatar>
+                        <div style="height:34px; width:34px; border:2px solid #ccc; border-radius:12px;"
+                             :style="{ background: item.hex}">
+                        </div>
                     </v-list-tile-avatar>
                     <v-list-tile-content>
-                        <v-list-tile-title>{{item.code}}</v-list-tile-title>
                         <v-list-tile-sub-title>{{item.description}}</v-list-tile-sub-title>
                     </v-list-tile-content>
                     <v-list-tile-action>
-                        <v-btn icon>
+                        <v-btn icon
+                               @click.native.stop="viewColor(item._id)">
                             <v-icon>info_outline</v-icon>
                         </v-btn>
                     </v-list-tile-action>
                     <v-list-tile-action>
-                        <v-btn icon>
+                        <v-btn icon
+                               @click.native.stop="deleteColor(item._id)">
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </v-list-tile-action>
@@ -33,7 +35,7 @@
                absolute
                fab
                style="bottom: 16px; right: 16px;"
-               @click.native="dialog=true">
+               @click.native="openDialog">
             <v-icon>add</v-icon>
         </v-btn>
         <v-dialog v-model="dialog"
@@ -50,7 +52,11 @@
                 </v-card-text>
                 <v-card-text class="grey lighten-4"
                              style="border-radius: 12px;">
-                    <div class="body-1 grey--text text--darken-1 ml-1">Color</div>
+                    <div class="body-1 grey--text text--darken-1 ml-1">
+                        Color
+                        <span v-if="validations.hex.length >0"
+                              class="red--text">*</span>
+                    </div>
                     <swatches v-model="model.hex"
                               background-color="#F5F5F5"
                               :colors="colors"
@@ -65,7 +71,7 @@
                            @click.stop="dialog=false">Close</v-btn>
                     <v-btn color="primary"
                            flat
-                           @click.stop="addOutlet">Save</v-btn>
+                           @click.stop="save">Save</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -84,13 +90,13 @@ export default {
     },
     data() {
         return {
+            currentId: null,
             list: [],
             dialog: false,
             model: {
                 description: null,
                 hex: null
             },
-            color: '#000000',
             colors: [
                 '#F44336', //red
                 '#E91E63', //pink
@@ -120,17 +126,74 @@ export default {
         }
     },
     methods: {
-        addOutlet() {
+        modelReset() {
+            this.model = {
+                description: null,
+                hex: null
+            }
+        },
+        openDialog() {
+            this.currentId = null
+            this.modelReset()
+            this.dialog = true
+        },
+        viewColor(str_id) {
+            let vm = this
+            vm.resetValidation() // mixin
+            vm.currentId = str_id
+
+            vm.axios
+                .get(`/settings/colors/${str_id}`)
+                .then(obj_response => {
+                    vm.model = obj_response.data
+                    vm.dialog = true
+                })
+                .catch(obj_exception => {})
+        },
+        deleteColor(str_id) {
             let vm = this
 
+            vm.axios
+                .delete(`/settings/colors/${str_id}`)
+                .then(obj_response => {
+                    this.$store.dispatch('addToast', obj_response.data)
+                    vm.load()
+                })
+                .catch(obj_exception => {})
+        },
+        save() {
+            if (this.currentId) {
+                this.editColor()
+            } else {
+                this.addColor()
+            }
+            this.load()
+        },
+        addColor() {
+            let vm = this
             vm
                 .post('/settings/colors', vm.model)
                 .then(obj_response => {
                     vm.dialog = false
                     vm.load()
+                    vm.$store.dispatch('showToast', { type: 'success', message: 'Success.' })
                 })
                 .catch(obj_exception => {})
         },
+        editColor() {
+            let vm = this
+
+            vm
+                .put(`/settings/colors/${vm.currentId}`, vm.model)
+                .then(obj_response => {
+                    vm.dialog = false
+                    vm.load()
+                })
+                .catch(obj_exception => {
+                    vm.dialog = true
+                })
+        },
+
         load() {
             this.axios
                 .get('/settings/colors')

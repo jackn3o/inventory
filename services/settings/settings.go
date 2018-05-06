@@ -54,6 +54,21 @@ func (s *settingService) Create(basePath string, mw ...base.Middleware) []base.E
 			Handler: base.Use(c.CreateColor(), mw...),
 			Method:  "POST",
 		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/colors/{id}"),
+			Handler: base.Use(c.GetColorByID(), mw...),
+			Method:  "GET",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/colors/{id}"),
+			Handler: base.Use(c.UpdateColor(), mw...),
+			Method:  "PUT",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/colors/{id}"),
+			Handler: base.Use(c.DeleteColor(), mw...),
+			Method:  "DELETE",
+		},
 	}
 }
 
