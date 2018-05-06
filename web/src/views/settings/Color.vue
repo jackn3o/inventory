@@ -175,8 +175,8 @@ export default {
                 .post('/settings/colors', vm.model)
                 .then(obj_response => {
                     vm.dialog = false
+                    this.$store.dispatch('addToast', obj_response.data)
                     vm.load()
-                    vm.$store.dispatch('showToast', { type: 'success', message: 'Success.' })
                 })
                 .catch(obj_exception => {})
         },
@@ -187,6 +187,7 @@ export default {
                 .put(`/settings/colors/${vm.currentId}`, vm.model)
                 .then(obj_response => {
                     vm.dialog = false
+                    this.$store.dispatch('addToast', obj_response.data)
                     vm.load()
                 })
                 .catch(obj_exception => {

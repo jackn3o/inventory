@@ -58,7 +58,7 @@ func (c *Controller) CreateColor() http.Handler {
 			return
 		}
 
-		u.WriteJSON(color.ID, http.StatusCreated)
+		u.WriteJSON("New color successfully added: "+color.Description, http.StatusCreated)
 	})
 }
 
@@ -73,7 +73,7 @@ func (c *Controller) GetColors() http.Handler {
 		collection := session.DB(c.databaseName).C(ColorSettingCollection)
 		err := collection.
 			Find(nil).
-			Select(bson.M{"code": 1, "description": 1, "hex": 1}).
+			Select(bson.M{"description": 1, "hex": 1}).
 			Sort("description").
 			All(&colors)
 		if err != nil {
@@ -135,23 +135,37 @@ func (c *Controller) UpdateColor() http.Handler {
 			return
 		}
 
-		isExist, err := c.isDescriptionExist(color.Description)
+		isRedefined, err := c.isDescriptionRedefine(colorID, color.Description)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
 
-		if isExist {
-			u.WriteJSONError("description exist", http.StatusConflict)
-			return
+		if isRedefined {
+			isExist, err := c.isDescriptionExist(color.Description)
+			if err != nil {
+				u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+				return
+			}
+
+			if isExist {
+				u.WriteJSONError("description exist", http.StatusConflict)
+				return
+			}
 		}
 
 		session := c.store.DB.Copy()
 		defer session.Close()
 		collection := session.DB(c.databaseName).C(ColorSettingCollection)
 
+		timeNow := time.Now()
 		selector := bson.M{"_id": bson.ObjectIdHex(colorID)}
-		updator := bson.M{"$set": bson.M{"description": color.Description, "hex": color.Hex}}
+		updator := bson.M{"$set": bson.M{
+			"description":  color.Description,
+			"hex":          color.Hex,
+			"modifiedDate": &timeNow,
+			"modifiedBy":   "todo",
+		}}
 		if err := collection.Update(selector, updator); err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
@@ -187,6 +201,27 @@ func (c *Controller) DeleteColor() http.Handler {
 	})
 }
 
+func (c *Controller) isDescriptionRedefine(colorID string, requestedDescription string) (bool, error) {
+	session := c.store.DB.Copy()
+	defer session.Close()
+
+	collection := session.DB(c.databaseName).C(ColorSettingCollection)
+	var original Color
+	err := collection.
+		Find(bson.M{"_id": bson.ObjectIdHex(colorID)}).
+		Select(bson.M{"description": 1}).
+		One(&original)
+
+	if err != nil {
+		return false, err
+	}
+
+	if original.Description == requestedDescription {
+		return false, nil
+	}
+
+	return true, err
+}
 func (c *Controller) isDescriptionExist(description string) (bool, error) {
 	session := c.store.DB.Copy()
 	defer session.Close()
