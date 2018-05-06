@@ -31,6 +31,18 @@ func (c *Controller) CreateCategory() http.Handler {
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
+
+		isExist, err := c.isKeyFieldsExist("", category.Code, category.Description)
+		if err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		if isExist {
+			u.WriteJSONError("Code or Description exist", http.StatusConflict)
+			return
+		}
+
 		session := c.store.DB.Copy()
 		defer session.Close()
 
@@ -57,7 +69,7 @@ func (c *Controller) CreateCategory() http.Handler {
 			return
 		}
 
-		u.WriteJSON(category.ID, http.StatusCreated)
+		u.WriteJSON("New category successfully added: "+category.Description, http.StatusCreated)
 	})
 }
 
@@ -91,4 +103,138 @@ func (c *Controller) GetCategories() http.Handler {
 
 		u.WriteJSON(categories)
 	})
+}
+
+// GetCategoryByID ...
+func (c *Controller) GetCategoryByID() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+		categoryID := mux.Vars(req)["id"]
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+
+		var categories Category
+		collection := session.DB(c.databaseName).C(CategorySettingCollection)
+		err := collection.
+			FindId(bson.ObjectIdHex(categoryID)).
+			Select(bson.M{"code": 1, "description": 1}).
+			One(&categories)
+		if err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON(categories)
+	})
+}
+
+// UpdateCategory by id
+func (c *Controller) UpdateCategory() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+
+		categoryID := mux.Vars(req)["id"]
+
+		if len(categoryID) <= 0 {
+			u.WriteJSONError("ID is require", http.StatusBadRequest)
+			return
+		}
+
+		category := &Category{}
+		err := u.UnmarshalWithValidation(category)
+		if err != nil {
+			u.WriteJSONError(err, http.StatusBadRequest)
+			return
+		}
+
+		isExist, err := c.isKeyFieldsExist(categoryID, category.Code, category.Description)
+		if err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		if isExist {
+			u.WriteJSONError("Code or Description exist", http.StatusConflict)
+			return
+		}
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+		collection := session.DB(c.databaseName).C(CategorySettingCollection)
+
+		timeNow := time.Now()
+		selector := bson.M{"_id": bson.ObjectIdHex(categoryID)}
+		updator := bson.M{"$set": bson.M{
+			"code":         category.Code,
+			"description":  category.Description,
+			"modifiedDate": &timeNow,
+			"modifiedBy":   "todo",
+		}}
+		if err := collection.Update(selector, updator); err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON("Update Successful")
+	})
+}
+
+// DeleteCategory by id
+func (c *Controller) DeleteCategory() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+
+		categoryID := mux.Vars(req)["id"]
+
+		if len(categoryID) <= 0 {
+			u.WriteJSONError("ID is require", http.StatusBadRequest)
+			return
+		}
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+
+		collection := session.DB(c.databaseName).C(CategorySettingCollection)
+		_, err := collection.RemoveAll(bson.M{"_id": bson.ObjectIdHex(categoryID)})
+		if err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON("Remove successful")
+	})
+}
+func (c *Controller) isKeyFieldsExist(categoryID string, categoryCode string, categoryDescription string) (bool, error) {
+	session := c.store.DB.Copy()
+	defer session.Close()
+
+	collection := session.DB(c.databaseName).C(CategorySettingCollection)
+
+	var selector bson.M
+	if len(categoryID) > 0 {
+		selector = bson.M{
+			"_id": bson.M{"$ne": bson.ObjectIdHex(categoryID)},
+			"$or": []bson.M{
+				bson.M{"code": bson.RegEx{Pattern: categoryCode, Options: "i"}},
+				bson.M{"description": bson.RegEx{Pattern: categoryDescription, Options: "i"}},
+			}}
+	} else {
+		selector = bson.M{
+			"$or": []bson.M{
+				bson.M{"code": bson.RegEx{Pattern: categoryCode, Options: "i"}},
+				bson.M{"description": bson.RegEx{Pattern: categoryDescription, Options: "i"}},
+			}}
+	}
+
+	count, err := collection.Find(selector).Count()
+	if err != nil {
+		return false, err
+	}
+
+	if count > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

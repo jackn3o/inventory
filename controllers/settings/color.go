@@ -32,7 +32,7 @@ func (c *Controller) CreateColor() http.Handler {
 			return
 		}
 
-		isExist, err := c.isDescriptionExist(color.Description)
+		isExist, err := c.isDescriptionExist("", color.Description)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
@@ -135,23 +135,15 @@ func (c *Controller) UpdateColor() http.Handler {
 			return
 		}
 
-		isRedefined, err := c.isDescriptionRedefine(colorID, color.Description)
+		isExist, err := c.isDescriptionExist(colorID, color.Description)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
 
-		if isRedefined {
-			isExist, err := c.isDescriptionExist(color.Description)
-			if err != nil {
-				u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
-				return
-			}
-
-			if isExist {
-				u.WriteJSONError("description exist", http.StatusConflict)
-				return
-			}
+		if isExist {
+			u.WriteJSONError("description exist", http.StatusConflict)
+			return
 		}
 
 		session := c.store.DB.Copy()
@@ -201,33 +193,25 @@ func (c *Controller) DeleteColor() http.Handler {
 	})
 }
 
-func (c *Controller) isDescriptionRedefine(colorID string, requestedDescription string) (bool, error) {
+func (c *Controller) isDescriptionExist(id string, description string) (bool, error) {
 	session := c.store.DB.Copy()
 	defer session.Close()
 
 	collection := session.DB(c.databaseName).C(ColorSettingCollection)
-	var original Color
-	err := collection.
-		Find(bson.M{"_id": bson.ObjectIdHex(colorID)}).
-		Select(bson.M{"description": 1}).
-		One(&original)
-
-	if err != nil {
-		return false, err
+	var selector bson.M
+	if len(id) > 0 {
+		selector = bson.M{
+			"_id": bson.M{"$ne": bson.ObjectIdHex(id)},
+			"$or": []bson.M{
+				bson.M{"description": bson.RegEx{Pattern: description, Options: "i"}},
+			}}
+	} else {
+		selector = bson.M{
+			"$or": []bson.M{
+				bson.M{"description": bson.RegEx{Pattern: description, Options: "i"}},
+			}}
 	}
-
-	if original.Description == requestedDescription {
-		return false, nil
-	}
-
-	return true, err
-}
-func (c *Controller) isDescriptionExist(description string) (bool, error) {
-	session := c.store.DB.Copy()
-	defer session.Close()
-
-	collection := session.DB(c.databaseName).C(ColorSettingCollection)
-	count, err := collection.Find(bson.M{"description": description}).Count()
+	count, err := collection.Find(selector).Count()
 	if err != nil {
 		return false, err
 	}

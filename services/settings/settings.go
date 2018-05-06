@@ -30,6 +30,21 @@ func (s *settingService) Create(basePath string, mw ...base.Middleware) []base.E
 			Handler: base.Use(c.CreateCategory(), mw...),
 			Method:  "POST",
 		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/categories/{id}"),
+			Handler: base.Use(c.GetCategoryByID(), mw...),
+			Method:  "GET",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/categories/{id}"),
+			Handler: base.Use(c.UpdateCategory(), mw...),
+			Method:  "PUT",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/categories/{id}"),
+			Handler: base.Use(c.DeleteCategory(), mw...),
+			Method:  "DELETE",
+		},
 
 		// outlet
 		base.EndPoint{
