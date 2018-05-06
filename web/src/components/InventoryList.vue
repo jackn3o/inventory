@@ -57,13 +57,9 @@
                                      @click="select(item._id)">
                             <v-list-tile-avatar>
                                 <v-avatar size="34px"
-                                          tile
-                                          color="#000000"
-                                          :style="getAvatarStyle(item.color)">
+                                          :style="{ background: getHex(item.color), border: '1px solid #cccccc'}">
                                     <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
                                 </v-avatar>
-                                <!-- <div :style="getAvatarStyle(item.color)"
-                                     style="height:40px;width:40px;"></div> -->
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                                 <v-list-tile-title class="body-1">
@@ -222,25 +218,19 @@ export default {
         select(str_id) {
             let vm = this
 
-            this.$router.push({ name: 'inventory.detail', params: { id: str_id } })
+            this.$router.push({ name: 'inventory.detail ', params: { id: str_id } })
         },
-        getAvatarStyle(str_colorId) {
+        getHex(str_colorId) {
             let vm = this
             if (!vm.colors || !str_colorId) {
-                return {
-                    backgroundColor: '#90A4AE !important',
-                    color: '#000'
-                }
+                return '#90A4AE'
             }
 
             let str_hex = vm.colors.find(obj_color => {
                 return obj_color._id == str_colorId
             }).hex
 
-            return {
-                backgroundColor: '#' + str_hex,
-                color: '#000'
-            }
+            return str_hex
         },
         isStringContain(value, key) {
             if (!value || !key) {
