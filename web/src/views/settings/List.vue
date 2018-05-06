@@ -20,7 +20,7 @@
                                  :key="m.title"
                                  @click="$router.push({name: m.to})">
                         <v-list-tile-avatar>
-                            <!-- <v-icon :class="[item.iconClass]">{{ item.icon }}</v-icon> -->
+                            <v-icon color="primary lighten-1">{{ m.icon }}</v-icon>
                         </v-list-tile-avatar>
                         <v-list-tile-content>
                             <v-list-tile-title>{{ m.title }}</v-list-tile-title>
@@ -49,22 +49,22 @@ export default {
         return {
             menus: [
                 {
+                    icon: 'grade',
                     title: 'Category',
                     to: 'settings.category'
                 },
                 {
+                    icon: 'color_lens',
                     title: 'Color',
                     to: 'settings.color'
                 },
                 {
+                    icon: 'attach_money',
                     title: 'Cost',
                     to: 'settings.cost'
                 },
-                // {
-                //     title: 'Item',
-                //     to: 'settings.item'
-                // },
                 {
+                    icon: 'business',
                     title: 'Outlet',
                     to: 'settings.outlet'
                 }
