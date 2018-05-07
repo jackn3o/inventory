@@ -15,7 +15,7 @@ type Controller struct {
 // New method is a constructor for controller.
 func New(store *connector.Store, config configuration.Config) *Controller {
 	return &Controller{
-		databaseName: config.GetString(configuration.DatabaseName),
+		databaseName: config.GetString(configuration.MainDatabaseName),
 		store:        store,
 		config:       config,
 	}

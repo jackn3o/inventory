@@ -20,11 +20,14 @@ const (
 	AppReadTimeout  = "app.timeout.read"
 	AppWriteTimeout = "app.timeout.write"
 
-	DatabaseHost     = "database.host"
-	DatabaseName     = "database.name"
-	DatabaseUsername = "database.username"
-	DatabasePassword = "database.password"
-	DatabaseTimeout  = "database.timeout"
+	DatabaseHost     = "database.connection.host"
+	DatabaseUsername = "database.connection.username"
+	DatabasePassword = "database.connection.password"
+	DatabaseTimeout  = "database.connection.timeout"
+
+	MainDatabaseName   = "database.main.name"
+	DemoDatabaseName   = "database.demo.name"
+	MasterDatabaseName = "database.master.name"
 
 	SecretKey = "secretKey"
 )
