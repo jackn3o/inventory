@@ -11,12 +11,6 @@
             </v-btn>
             <v-toolbar-title>{{ title }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon>
-                <v-icon class="blue-grey--text text--darken-3">delete</v-icon>
-            </v-btn>
-            <v-btn icon>
-                <v-icon class="blue-grey--text text--darken-3">more_vert</v-icon>
-            </v-btn>
             <v-tabs slot="extension"
                     centered
                     v-model="tabs"
@@ -57,9 +51,13 @@
                     <td v-if="tabs == '0'"
                         class="text-xs-right">{{ to2Decimal(props.item.utdCost) }}</td>
                     <td class="text-xs-center">
-                        <v-icon color="red"
-                                v-if="props.item.remark">announcement
-                        </v-icon>
+                        <v-tooltip v-if="props.item.remark"
+                                   bottom>
+                            <v-icon slot="activator"
+                                    color="red">announcement</v-icon>
+                            <span>{{ props.item.remark }}</span>
+                        </v-tooltip>
+
                     </td>
                 </template>
                 <v-alert slot="no-results"

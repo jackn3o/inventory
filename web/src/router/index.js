@@ -15,21 +15,18 @@ import Outlet from '@/views/settings/Outlet.vue'
 // router, routes, auth guard
 Vue.use(Router)
 
-const routes = [
-  {
+const routes = [{
     path: '/',
     name: 'inventory.list',
     meta: {
       auth: true
     },
     component: InventoryList,
-    children: [
-      {
-        path: '/inventory/:id',
-        name: 'inventory.detail',
-        component: InventoryDetail
-      }
-    ]
+    children: [{
+      path: '/inventory/:id',
+      name: 'inventory.detail',
+      component: InventoryDetail
+    }]
   },
   {
     path: '/settings',
@@ -38,8 +35,7 @@ const routes = [
       auth: true
     },
     component: SettingList,
-    children: [
-      {
+    children: [{
         path: '/settings/category',
         name: 'settings.category',
         meta: {

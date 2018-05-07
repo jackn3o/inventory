@@ -14,9 +14,6 @@
                            @click="isAddNew=true">
                         <v-icon>add</v-icon>
                     </v-btn>
-                    <v-btn icon>
-                        <v-icon>more_vert</v-icon>
-                    </v-btn>
                     <template slot="extension">
                         <v-text-field v-model="searchKey"
                                       prepend-icon="search"
@@ -43,12 +40,13 @@
                             </v-list-tile-content>
                         </v-list-tile> -->
                     <template v-for="category in categories">
-                        <v-subheader :key="category._id">
+                        <v-subheader v-if="getCategoryItemsCount(category._id)>0"
+                                     :key="category._id">
                             {{ category.description }}
                             <v-spacer></v-spacer>
-                            <div class="category_count_badge">{{ list.filter(obj_item=> { return obj_item.category == category._id}).length || 0 }}</div>
+                            <div class="category_count_badge">{{ getCategoryItemsCount(category._id)}}</div>
                         </v-subheader>
-                        <v-list-tile v-for="item in list.filter(obj_item=> { return obj_item.category == category._id})"
+                        <v-list-tile v-for="item in filteredItems.filter(obj_item=> { return obj_item.category == category._id})"
                                      :key="item.code"
                                      avatar
                                      ripple
@@ -57,7 +55,7 @@
                                      @click="select(item._id)">
                             <v-list-tile-avatar>
                                 <v-avatar size="34px"
-                                          :style="{ background: getHex(item.color), border: '1px solid #cccccc'}">
+                                          :style="{ background: getHex(item.color), color: getFontColor(item.color), border: '1px solid #cccccc'}">
                                     <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
                                 </v-avatar>
                             </v-list-tile-avatar>
@@ -87,7 +85,6 @@
         <v-flex :class="contentClasses">
             <transition name="slide-x-reverse-transition"
                         mode="in-out">
-                <!-- <transition :name="$route.name == 'inventory:list'? 'slide-x-reverse-transition':'slide-y-reverse-transition'"> -->
                 <router-view style="z-index:6; overflow:hidden; height:100%; border-left: 1px solid rgba(0,0,0,0.12)">
                 </router-view>
             </transition>
@@ -116,7 +113,6 @@ export default {
         currentId() {
             return this.$route.params.id || ''
         },
-
         filteredItems() {
             let vm = this
             if (!vm.searchKey) {
@@ -167,6 +163,14 @@ export default {
         }
     },
     methods: {
+        getCategoryItemsCount(str_categoryId) {
+            let vm = this
+            return (
+                vm.filteredItems.filter(obj_item => {
+                    return obj_item.category == str_categoryId
+                }).length || 0
+            )
+        },
         load() {
             this.axios
                 .get('/settings/categories')
@@ -190,9 +194,6 @@ export default {
                     }
 
                     this.colors = obj_response.data
-                    // .map(obj_data => {
-                    //     return { description: obj_data.description, active: false }
-                    // })
                 })
                 .catch(obj_exception => {})
 
@@ -203,13 +204,6 @@ export default {
                     this.setActiveCategories()
                 })
                 .catch(obj_exception => {})
-
-            // let vm = this,
-            //     MockData = require('./../data.js')
-
-            // MockData.getInventory().then(obj_response => {
-            //     vm.list = obj_response
-            // })
         },
         close() {
             this.load()
@@ -218,7 +212,7 @@ export default {
         select(str_id) {
             let vm = this
 
-            this.$router.push({ name: 'inventory.detail ', params: { id: str_id } })
+            this.$router.push({ name: 'inventory.detail', params: { id: str_id } })
         },
         getHex(str_colorId) {
             let vm = this
@@ -231,6 +225,19 @@ export default {
             }).hex
 
             return str_hex
+        },
+        getFontColor(str_colorId) {
+            let vm = this
+            debugger
+            switch (vm.getHex(str_colorId).toLowerCase()) {
+                case '#ffffff':
+                case 'ffffff':
+                    return '#000000'
+                    break
+                default:
+                    return '#ffffff'
+                    break
+            }
         },
         isStringContain(value, key) {
             if (!value || !key) {
