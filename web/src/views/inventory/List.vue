@@ -54,7 +54,7 @@
                                      :class="[item._id == currentId? 'grey lighten-4':'']"
                                      @click="select(item._id)">
                             <v-list-tile-avatar>
-                                <v-avatar size="34px"
+                                <v-avatar size="40px"
                                           :style="{ background: getHex(item.color), color: getFontColor(item.color), border: '1px solid #cccccc'}">
                                     <span class="subheading">{{ (item.code)? item.code.charAt(0) : '?' }}</span>
                                 </v-avatar>
