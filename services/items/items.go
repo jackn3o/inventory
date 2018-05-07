@@ -9,7 +9,7 @@ import (
 	controller "../../controllers/items"
 )
 
-// authenticationService is one router service.
+// itemService is one router service.
 type itemService struct {
 	store  *connector.Store
 	config configuration.Config
