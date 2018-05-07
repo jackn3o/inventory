@@ -231,7 +231,6 @@ export default {
         },
         getFontColor(str_colorId) {
             let vm = this
-            debugger
             switch (vm.getHex(str_colorId).toLowerCase()) {
                 case '#ffffff':
                 case 'ffffff':

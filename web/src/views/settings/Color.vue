@@ -29,15 +29,17 @@
                 <v-divider :key="'d-'+item._id"></v-divider>
             </template>
         </v-list>
-        <v-btn v-if="!dialog"
-               color="pink"
-               dark
-               absolute
-               fab
-               style="bottom: 16px; right: 16px;"
-               @click.native="openDialog">
-            <v-icon>add</v-icon>
-        </v-btn>
+        <v-fab-transition>
+            <v-btn v-if="!dialog"
+                   color="pink"
+                   dark
+                   absolute
+                   fab
+                   style="bottom: 16px; right: 16px;"
+                   @click.native="openDialog">
+                <v-icon>add</v-icon>
+            </v-btn>
+        </v-fab-transition>
         <v-dialog v-model="dialog"
                   max-width="500px">
             <v-card class="pa-3">
