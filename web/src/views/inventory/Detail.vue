@@ -60,6 +60,22 @@
 
                     </td>
                 </template>
+                <template slot="no-data">
+                    <v-layout align-center
+                              justify-center
+                              @click="dialog=true">
+                        <v-flex xs12
+                                sm8
+                                md4
+                                class="text-xs-center pa-3">
+                            <v-icon class="display-4"
+                                    color="blue-grey lighten-4">playlist_add</v-icon>
+                            <div class="headline grey--text">Nothing here yet</div>
+                            <div class="body-1 grey--text">Click to add some item</div>
+                        </v-flex>
+                    </v-layout>
+
+                </template>
                 <v-alert slot="no-results"
                          :value="true"
                          color="error"
@@ -68,17 +84,19 @@
                 </v-alert>
             </v-data-table>
         </v-card-text>
-        <v-btn v-if="!dialog"
-               color="pink"
-               dark
-               absolute
-               fab
-               style="bottom: 16px; right: 16px;"
-               @click.native="dialog=true">
-            <v-icon>add</v-icon>
-        </v-btn>
+        <v-fab-transition>
+            <v-btn v-if="!dialog"
+                   color="pink"
+                   dark
+                   absolute
+                   fab
+                   style="bottom: 16px; right: 16px;"
+                   @click.native="dialog=true">
+                <v-icon>add</v-icon>
+            </v-btn>
+        </v-fab-transition>
         <v-dialog v-model="dialog"
-                  max-width="500px">
+                  max-width="600px">
             <v-card class="pa-3"
                     v-if="dialog">
                 <v-card-title class="title">
