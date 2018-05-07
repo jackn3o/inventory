@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import validator from '@/mixins/validator'
 export default {
     data() {
         return {
@@ -92,11 +93,8 @@ export default {
     },
     methods: {
         authenticate() {
-            let obj_user = {
-                username: 'test',
-                password: '1111qqqq'
-            }
-            this.axios.post('localhost:8000/authenticate', obj_user).then(obj_response => {
+            let vm = this
+            vm.post('/authenticate', vm.model).then(obj_response => {
                 console.log(obj_response.data)
             })
         }
