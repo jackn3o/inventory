@@ -223,11 +223,15 @@ export default {
                 return '#90A4AE'
             }
 
-            let str_hex = vm.colors.find(obj_color => {
+            let obj_targetColors = vm.colors.find(obj_color => {
                 return obj_color._id == str_colorId
-            }).hex
+            })
 
-            return str_hex
+            if (!obj_targetColors) {
+                return '#90A4AE'
+            }
+
+            return obj_targetColors.hex
         },
         getFontColor(str_colorId) {
             let vm = this

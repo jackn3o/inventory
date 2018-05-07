@@ -19,12 +19,7 @@ func (s *authenticationService) Create(basePath string, mw ...base.Middleware) [
 	c := controller.New(s.store, s.config)
 	return []base.EndPoint{
 		base.EndPoint{
-			Path:    path.Join(basePath, ""),
-			Handler: base.Use(c.GenerateToken(), mw...),
-			Method:  "GET",
-		},
-		base.EndPoint{
-			Path:    path.Join(basePath, ""),
+			Path:    path.Join(basePath, "/login"),
 			Handler: base.Use(c.Authenticate(), mw...),
 			Method:  "POST",
 		},

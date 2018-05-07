@@ -21,12 +21,24 @@ Vue.use(VueLodash, lodash)
 Vue.config.productionTip = false
 const instance = axios.create(axiosConfig)
 instance.interceptors.request.use(config => {
+  // set default headers
+  config.headers['X-Client'] = 'inventory app'
+
   // if (config.method == 'post') {
   //   config.headers['Content-Type'] = 'text/plain'
   //   config.data = JSON.stringify(config.data)
   // } else {
   //   config.headers['Content-Type'] = 'application/json'
   // }
+  // // only if content type not specified
+  // if (config.headers['Content-Type'] === '') {
+  //   config.headers['Content-Type'] = 'application/json'
+  // }
+
+  if (store.getters.authorized) {
+    let token = store.getters.token
+    config.headers['Authorization'] = `Bearer ${token}`
+  }
 
   return config
 })

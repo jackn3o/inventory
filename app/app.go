@@ -28,10 +28,10 @@ func Start(config configuration.Config) {
 
 	setupRouter(rootContext, config, router)
 	corsmw := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		// AllowCredentials: true,
-		AllowedHeaders: []string{"Content-Type"},
-		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Content-Type", "Origin", "Authorization", "X-Client"},
+		AllowedMethods:   []string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"},
 	})
 	server := http.Server{
 		ReadTimeout:  config.GetDuration(configuration.AppReadTimeout) * time.Second,
@@ -60,9 +60,9 @@ func setupRouter(ctx context.Context, config configuration.Config, router *mux.R
 	store := connector.New(config)
 
 	apiRouter := router.PathPrefix(config.GetString(configuration.AppAPIBase)).Subrouter()
-	service.Register(apiRouter, "/authentication", authenticationservice.New(store, config), jwtmw)
+	service.Register(apiRouter, "/authentication", authenticationservice.New(store, config))
 	service.Register(apiRouter, "/public", authenticationservice.New(store, config))
-	service.Register(apiRouter, "/items", itemsservice.New(store, config))
-	service.Register(apiRouter, "/settings", settingsservice.New(store, config))
+	service.Register(apiRouter, "/items", itemsservice.New(store, config), jwtmw)
+	service.Register(apiRouter, "/settings", settingsservice.New(store, config), jwtmw)
 
 }

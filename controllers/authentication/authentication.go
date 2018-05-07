@@ -3,8 +3,6 @@ package authentication
 // https://auth0.com/blog/authentication-in-golang/
 // Import our dependencies. We'll use the standard http library as well as the gorilla router for this app
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -16,10 +14,22 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// constant key
+const (
+	UsersCollection = "users"
+)
+
 // LoginDto ...
 type LoginDto struct {
-	Username string `bson:"username" json:"username" valid:"require"`
-	Password string `bson:"password" json:"password" valid:"require"`
+	Username string `bson:"username" json:"username" valid:"required"`
+	Password string `bson:"password" json:"password" valid:"required"`
+}
+
+// TokenResponseDto ...
+type TokenResponseDto struct {
+	Username  string `json:"username"`
+	Token     string `json:"token"`
+	ExpiredAt int64  `json:"expiredAt"`
 }
 
 // Controller is return value for New method
@@ -52,12 +62,9 @@ func (c *Controller) Authenticate() http.Handler {
 		defer userSession.Close()
 
 		// Generate "hash" from request password
-		hash, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
-		if err != nil {
-			u.WriteJSONError("something wrong", http.StatusBadRequest)
-		}
 
-		userCollection := userSession.DB(c.config.GetString(configuration.MasterDatabaseName)).C("users")
+		masterDatabaseName := c.config.GetString(configuration.MasterDatabaseName)
+		userCollection := userSession.DB(masterDatabaseName).C(UsersCollection)
 		selector := bson.M{
 			"username": bson.RegEx{Pattern: dto.Username, Options: "i"},
 		}
@@ -69,45 +76,49 @@ func (c *Controller) Authenticate() http.Handler {
 			return
 		}
 
-		if err := bcrypt.CompareHashAndPassword(hash, []byte(user.Password)); err != nil {
-			u.WriteJSONError("Invalid password", http.StatusBadRequest)
+		isMatch := checkPasswordHash(dto.Password, user.Password)
+		if isMatch == false {
+			u.WriteJSONError("Password not match", http.StatusBadRequest)
+			return
 		}
 
-		c.GenerateToken()
+		expiredAt := time.Now().Add(time.Hour * 24).Unix()
 
-		u.WriteJSON("success")
+		responseDTO := TokenResponseDto{
+			Username:  dto.Username,
+			Token:     c.generateToken(dto.Username, expiredAt),
+			ExpiredAt: expiredAt,
+		}
+
+		u.WriteJSON(responseDTO)
 	})
 }
 
-// GenerateToken for authentication
-func (c *Controller) GenerateToken() http.Handler {
-	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
-		u := utility.New(writer, req)
+// generateToken for authentication
+func (c *Controller) generateToken(username string, expiredAt int64) string {
+	/* Create the token */
+	token := jwt.New(jwt.SigningMethodHS256)
 
-		/* Create the token */
-		token := jwt.New(jwt.SigningMethodHS256)
+	/* Create a map to store our claims */
+	tokenClaims := token.Claims.(jwt.MapClaims)
 
-		/* Create a map to store our claims */
-		tokenClaims := token.Claims.(jwt.MapClaims)
+	/* Set token claims */
+	tokenClaims["admin"] = true
+	tokenClaims["name"] = username
+	tokenClaims["exp"] = expiredAt
 
-		/* Set token claims */
-		tokenClaims["admin"] = true
-		tokenClaims["name"] = "admin"
-		tokenClaims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	/* Sign the token with our secret */
+	tokenString, _ := token.SignedString([]byte(c.config.GetString(configuration.SecretKey)))
 
-		// Generate "hash" to store from user password
-		hash, err := bcrypt.GenerateFromPassword([]byte("p@ssw0rd"), bcrypt.DefaultCost)
-		if err != nil {
-			// TODO: Properly handle error
-			log.Fatal(err)
-		}
-		fmt.Println(string(hash))
+	return tokenString
+}
 
-		/* Sign the token with our secret */
-		tokenString, _ := token.SignedString([]byte(c.config.GetString(configuration.SecretKey)))
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
 
-		/* Finally, write the token to the browser window */
-		u.WriteJSON(tokenString)
-		// w.Write([]byte(tokenString))
-	})
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

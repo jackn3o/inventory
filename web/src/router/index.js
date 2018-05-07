@@ -4,7 +4,7 @@ import store from '../store'
 
 
 import Login from '@/views/Login'
-import Main from '@/views/main'
+import Main from '@/views/Main'
 //inventory
 import InventoryList from '@/views/inventory/List'
 import InventoryDetail from '@/views//inventory/Detail'
@@ -20,7 +20,7 @@ Vue.use(Router)
 
 const routes = [ //
   {
-    path: '',
+    path: '/',
     name: 'main',
     meta: {
       auth: true
@@ -28,11 +28,8 @@ const routes = [ //
     component: Main,
     children: [ //
       {
-        path: '/',
+        path: '/inventory',
         name: 'inventory.list',
-        meta: {
-          auth: true
-        },
         component: InventoryList,
         children: [{
           path: '/inventory/:id',
@@ -43,9 +40,6 @@ const routes = [ //
       {
         path: '/settings',
         name: 'settings',
-        meta: {
-          auth: true
-        },
         component: SettingList,
         children: [ //
           {
@@ -109,12 +103,22 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.auth)) {
-    // if (!store.getters.authorized) {
-    //   next({
-    //     path: '/login',
-    //   })
-    //   return
-    // }
+    if (!store.getters.authorized) {
+      next({
+        name: 'login',
+      })
+      return
+    }
+  } else if (to.matched.some(record => record.meta.auth === false)) {
+    // redirect to home if already logged in
+    if (store.getters.authorized) {
+      store.dispatch('addToast', 'Already logged in')
+
+      next({
+        path: 'inventory.list'
+      })
+      return
+    }
   }
 
   next()
