@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import store from '../store'
+
+
 import Login from '@/components/Login'
 
+import Main from '@/views/main'
 //inventory
 import InventoryList from '@/views/inventory/List'
 import InventoryDetail from '@/views//inventory/Detail'
@@ -16,67 +19,78 @@ import Outlet from '@/views/settings/Outlet.vue'
 // router, routes, auth guard
 Vue.use(Router)
 
-const routes = [{
-    path: '/',
-    name: 'inventory.list',
-    meta: {
-      auth: true
-    },
-    component: InventoryList,
-    children: [{
-      path: '/inventory/:id',
-      name: 'inventory.detail',
-      component: InventoryDetail
-    }]
-  },
+const routes = [ //
   {
-    path: '/settings',
-    name: 'settings',
+    path: '',
+    name: 'main',
     meta: {
       auth: true
     },
-    component: SettingList,
+    component: Main,
     children: [ //
       {
-        path: '/settings/category',
-        name: 'settings.category',
+        path: '/',
+        name: 'inventory.list',
         meta: {
-          title: 'Category'
+          auth: true
         },
-        component: Category
+        component: InventoryList,
+        children: [{
+          path: '/inventory/:id',
+          name: 'inventory.detail',
+          component: InventoryDetail
+        }]
       },
       {
-        path: '/settings/color',
-        name: 'settings.color',
+        path: '/settings',
+        name: 'settings',
         meta: {
-          title: 'Color'
+          auth: true
         },
-        component: Color
+        component: SettingList,
+        children: [ //
+          {
+            path: '/settings/category',
+            name: 'settings.category',
+            meta: {
+              title: 'Category'
+            },
+            component: Category
+          },
+          {
+            path: '/settings/color',
+            name: 'settings.color',
+            meta: {
+              title: 'Color'
+            },
+            component: Color
+          },
+          {
+            path: '/settings/cost',
+            name: 'settings.cost',
+            meta: {
+              title: 'Cost'
+            },
+            component: Cost
+          },
+          {
+            path: '/settings/item',
+            name: 'settings.item',
+            meta: {
+              title: 'Item'
+            },
+            component: Item
+          },
+          {
+            path: '/settings/outlet',
+            name: 'settings.outlet',
+            meta: {
+              title: 'Outlet'
+            },
+            component: Outlet
+          }
+        ]
       },
-      {
-        path: '/settings/cost',
-        name: 'settings.cost',
-        meta: {
-          title: 'Cost'
-        },
-        component: Cost
-      },
-      {
-        path: '/settings/item',
-        name: 'settings.item',
-        meta: {
-          title: 'Item'
-        },
-        component: Item
-      },
-      {
-        path: '/settings/outlet',
-        name: 'settings.outlet',
-        meta: {
-          title: 'Outlet'
-        },
-        component: Outlet
-      }
     ]
   },
   {
