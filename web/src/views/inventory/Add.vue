@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import validator from '../mixins/validator'
+import validator from '@/mixins/validator'
 export default {
     mixins: [validator],
     data() {

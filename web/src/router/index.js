@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import store from '../store'
-import InventoryList from '@/components/InventoryList'
-import InventoryDetail from '@/components/InventoryDetail'
 import Login from '@/components/Login'
 
+//inventory
+import InventoryList from '@/views/inventory/List'
+import InventoryDetail from '@/views//inventory/Detail'
 //settings
 import SettingList from '@/views/settings/List.vue'
 import Category from '@/views/settings/Category.vue'

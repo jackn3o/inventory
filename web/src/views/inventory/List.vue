@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import AddInventory from './AddInventory.vue'
+import AddInventory from './add.vue'
 
 export default {
     components: {
