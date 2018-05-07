@@ -57,6 +57,21 @@ func (s *settingService) Create(basePath string, mw ...base.Middleware) []base.E
 			Handler: base.Use(c.CreateOutlet(), mw...),
 			Method:  "POST",
 		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/outlets/{id}"),
+			Handler: base.Use(c.GetOutletByID(), mw...),
+			Method:  "GET",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/outlets/{id}"),
+			Handler: base.Use(c.UpdateOutlet(), mw...),
+			Method:  "PUT",
+		},
+		base.EndPoint{
+			Path:    path.Join(basePath, "/outlets/{id}"),
+			Handler: base.Use(c.DeleteOutlet(), mw...),
+			Method:  "DELETE",
+		},
 
 		// colors
 		base.EndPoint{

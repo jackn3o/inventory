@@ -32,7 +32,7 @@ func (c *Controller) CreateCategory() http.Handler {
 			return
 		}
 
-		isExist, err := c.isKeyFieldsExist("", category.Code, category.Description)
+		isExist, err := c.isKeyFieldsExist("", CategorySettingCollection, category.Code, category.Description)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
@@ -148,7 +148,7 @@ func (c *Controller) UpdateCategory() http.Handler {
 			return
 		}
 
-		isExist, err := c.isKeyFieldsExist(categoryID, category.Code, category.Description)
+		isExist, err := c.isKeyFieldsExist(categoryID, CategorySettingCollection, category.Code, category.Description)
 		if err != nil {
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
@@ -204,37 +204,4 @@ func (c *Controller) DeleteCategory() http.Handler {
 
 		u.WriteJSON("Remove successful")
 	})
-}
-func (c *Controller) isKeyFieldsExist(categoryID string, categoryCode string, categoryDescription string) (bool, error) {
-	session := c.store.DB.Copy()
-	defer session.Close()
-
-	collection := session.DB(c.databaseName).C(CategorySettingCollection)
-
-	var selector bson.M
-	if len(categoryID) > 0 {
-		selector = bson.M{
-			"_id": bson.M{"$ne": bson.ObjectIdHex(categoryID)},
-			"$or": []bson.M{
-				bson.M{"code": bson.RegEx{Pattern: categoryCode, Options: "i"}},
-				bson.M{"description": bson.RegEx{Pattern: categoryDescription, Options: "i"}},
-			}}
-	} else {
-		selector = bson.M{
-			"$or": []bson.M{
-				bson.M{"code": bson.RegEx{Pattern: categoryCode, Options: "i"}},
-				bson.M{"description": bson.RegEx{Pattern: categoryDescription, Options: "i"}},
-			}}
-	}
-
-	count, err := collection.Find(selector).Count()
-	if err != nil {
-		return false, err
-	}
-
-	if count > 0 {
-		return true, nil
-	}
-
-	return false, nil
 }

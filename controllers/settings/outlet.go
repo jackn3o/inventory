@@ -5,6 +5,7 @@ import (
 	"time"
 
 	utility "../../base/utilities"
+	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -80,5 +81,106 @@ func (c *Controller) GetOutlets() http.Handler {
 		}
 
 		u.WriteJSON(outlets)
+	})
+}
+
+// GetOutletByID ...
+func (c *Controller) GetOutletByID() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+		outletID := mux.Vars(req)["id"]
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+
+		var outlet Outlet
+		collection := session.DB(c.databaseName).C(OutletSettingCollection)
+		err := collection.
+			FindId(bson.ObjectIdHex(outletID)).
+			Select(bson.M{"code": 1, "description": 1}).
+			One(&outlet)
+		if err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON(outlet)
+	})
+}
+
+// UpdateOutlet by id
+func (c *Controller) UpdateOutlet() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+
+		outletID := mux.Vars(req)["id"]
+
+		if len(outletID) <= 0 {
+			u.WriteJSONError("ID is require", http.StatusBadRequest)
+			return
+		}
+
+		outlet := &Outlet{}
+		err := u.UnmarshalWithValidation(outlet)
+		if err != nil {
+			u.WriteJSONError(err, http.StatusBadRequest)
+			return
+		}
+
+		isExist, err := c.isKeyFieldsExist(outletID, OutletSettingCollection, outlet.Code, outlet.Description)
+		if err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		if isExist {
+			u.WriteJSONError("Code or Description exist", http.StatusConflict)
+			return
+		}
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+		collection := session.DB(c.databaseName).C(OutletSettingCollection)
+
+		timeNow := time.Now()
+		selector := bson.M{"_id": bson.ObjectIdHex(outletID)}
+		updator := bson.M{"$set": bson.M{
+			"code":         outlet.Code,
+			"description":  outlet.Description,
+			"modifiedDate": &timeNow,
+			"modifiedBy":   "todo",
+		}}
+		if err := collection.Update(selector, updator); err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON("Update Successful")
+	})
+}
+
+// DeleteOutlet by id
+func (c *Controller) DeleteOutlet() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+
+		outletID := mux.Vars(req)["id"]
+
+		if len(outletID) <= 0 {
+			u.WriteJSONError("ID is require", http.StatusBadRequest)
+			return
+		}
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+
+		collection := session.DB(c.databaseName).C(OutletSettingCollection)
+		_, err := collection.RemoveAll(bson.M{"_id": bson.ObjectIdHex(outletID)})
+		if err != nil {
+			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON("Remove successful")
 	})
 }
