@@ -23,6 +23,11 @@ func (s *authenticationService) Create(basePath string, mw ...base.Middleware) [
 			Handler: base.Use(c.GenerateToken(), mw...),
 			Method:  "GET",
 		},
+		base.EndPoint{
+			Path:    path.Join(basePath, ""),
+			Handler: base.Use(c.Authenticate(), mw...),
+			Method:  "POST",
+		},
 	}
 }
 
