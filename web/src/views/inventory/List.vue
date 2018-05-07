@@ -93,12 +93,14 @@
 </template>
 
 <script>
+import commonMethods from '@/mixins/common_methods.js'
 import AddInventory from './add.vue'
 
 export default {
     components: {
         AddInventory
     },
+    mixins: [commonMethods],
     data() {
         return {
             searchKey: null,
@@ -121,7 +123,8 @@ export default {
 
             return vm.list.filter(obj_item => {
                 return (
-                    vm.isStringContain(obj_item.code, vm.searchKey) || vm.isStringContain(obj_item.code, vm.searchKey)
+                    vm.isStringContain(obj_item.code, vm.searchKey) ||
+                    vm.isStringContain(obj_item.description, vm.searchKey)
                 )
             })
         },
@@ -239,20 +242,7 @@ export default {
                     break
             }
         },
-        isStringContain(value, key) {
-            if (!value || !key) {
-                return false
-            }
 
-            let str_value = String(value).toLowerCase(),
-                str_key = String(key).toLowerCase()
-
-            if (str_value.search(str_key) >= 0) {
-                return true
-            }
-
-            return false
-        },
         setActiveCategories() {
             let vm = this
             if (!vm.list || vm.currentId) {

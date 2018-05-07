@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-list two-line>
-            <template v-for="item in list">
+            <template v-for="item in filteredItems">
                 <v-list-tile avatar
                              dense
                              :key="item._id">
@@ -16,13 +16,13 @@
                     <v-list-tile-action>
                         <v-btn icon
                                @click.native.stop="viewColor(item._id)">
-                            <v-icon>info_outline</v-icon>
+                            <v-icon color="grey lighten-1">info_outline</v-icon>
                         </v-btn>
                     </v-list-tile-action>
                     <v-list-tile-action>
                         <v-btn icon
                                @click.native.stop="deleteColor(item._id)">
-                            <v-icon>delete</v-icon>
+                            <v-icon color="red lighten-1">delete</v-icon>
                         </v-btn>
                     </v-list-tile-action>
                 </v-list-tile>
@@ -42,7 +42,7 @@
                   max-width="500px">
             <v-card class="pa-3">
                 <v-card-title class="title">
-                    Add Color
+                    {{ currentId == null? 'Add' : 'Edit'}} Color
                 </v-card-title>
                 <v-card-text>
                     <v-text-field v-model="model.description"
@@ -82,11 +82,18 @@
 import Swatches from 'vue-swatches'
 // Import the styles too, globally
 import 'vue-swatches/dist/vue-swatches.min.css'
+import commonMethods from '@/mixins/common_methods'
 import validator from '../../mixins/validator'
 export default {
-    mixins: [validator],
+    mixins: [commonMethods, validator],
     components: {
         Swatches
+    },
+    props: {
+        searchKey: {
+            type: String,
+            default: null
+        }
     },
     data() {
         return {
@@ -123,6 +130,18 @@ export default {
             wrapperStyle: {
                 width: '100%'
             }
+        }
+    },
+    computed: {
+        filteredItems() {
+            let vm = this
+            if (!vm.searchKey) {
+                return vm.list
+            }
+
+            return vm.list.filter(obj_color => {
+                return vm.isStringContain(obj_color.description, vm.searchKey)
+            })
         }
     },
     methods: {

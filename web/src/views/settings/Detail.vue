@@ -4,18 +4,18 @@
                    flat
                    prominent
                    extended>
-            <v-btn icon
-                   class="hidden-md-and-up"
-                   @click.native="$router.push({name:'inventory.list'})">
+            <!-- <v-btn icon
+                   class="hidden-md-and-up">
                 <v-icon>keyboard_backspace</v-icon>
-            </v-btn>
+            </v-btn> -->
             <v-toolbar-title class="hidden-md-and-up">{{ $route.meta.title }}</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-layout slot="extension">
                 <v-flex xs12
                         lg8
                         offset-lg2>
-                    <v-text-field v-model="searchKey"
+                    <v-text-field v-if="isShowSearch"
+                                  v-model="searchKey"
                                   prepend-icon="search"
                                   label="search"
                                   solo-inverted
@@ -28,7 +28,7 @@
             <v-flex xs12
                     lg8
                     offset-lg2>
-                <router-view></router-view>
+                <router-view :searchKey="searchKey"></router-view>
             </v-flex>
         </v-layout>
     </div>
@@ -39,6 +39,17 @@ export default {
     data() {
         return {
             searchKey: null
+        }
+    },
+    computed: {
+        currentRouteName() {
+            return this.$route.name
+        },
+        isShowSearch() {
+            if (this.currentRouteName == 'settings.cost') {
+                return false
+            }
+            return true
         }
     }
 }

@@ -5,7 +5,7 @@
         </div>
         <v-radio-group v-model="model.costMethod"
                        :mandatory="false">
-            <v-radio label="Avarage"
+            <v-radio label="Average"
                      :value="1"></v-radio>
             <v-radio label="Coming Soon"
                      disabled

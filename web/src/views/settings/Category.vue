@@ -1,12 +1,13 @@
 <template>
     <div>
         <v-list two-line>
-            <template v-for="item in list">
+            <template v-for="item in filteredItems">
                 <v-list-tile avatar
                              :key="item._id">
                     <v-list-tile-avatar>
-                        <v-avatar class="red">
-                            <span class="white--text headline">{{ item.code }}</span>
+                        <v-avatar class="accent"
+                                  :size="40">
+                            <span class="white--text title">{{ item.code }}</span>
                         </v-avatar>
                     </v-list-tile-avatar>
                     <v-list-tile-content>
@@ -16,13 +17,13 @@
                     <v-list-tile-action>
                         <v-btn icon
                                @click.stop="viewCategory(item._id)">
-                            <v-icon>info_outline</v-icon>
+                            <v-icon color="grey lighten-1">info_outline</v-icon>
                         </v-btn>
                     </v-list-tile-action>
                     <v-list-tile-action>
                         <v-btn icon
                                @click.stop="deleteCategory(item._id)">
-                            <v-icon>delete</v-icon>
+                            <v-icon color="red lighten-1">delete</v-icon>
                         </v-btn>
                     </v-list-tile-action>
                 </v-list-tile>
@@ -42,7 +43,7 @@
                   max-width="500px">
             <v-card class="pa-3">
                 <v-card-title class="title">
-                    Add Category
+                    {{ currentId == null? 'Add' : 'Edit'}} Category
                 </v-card-title>
                 <v-card-text>
                     <v-text-field v-model="model.code"
@@ -69,18 +70,41 @@
 </template>
 
 <script>
-import validator from '../../mixins/validator'
+import commonMethods from '@/mixins/common_methods'
+import validator from '@/mixins/validator'
+
 export default {
-    mixins: [validator],
+    mixins: [commonMethods, validator],
+    props: {
+        searchKey: {
+            type: String,
+            default: null
+        }
+    },
     data() {
         return {
             currentId: null,
-            list: [],
             dialog: false,
+            list: [],
             model: {
                 code: null,
                 description: null
             }
+        }
+    },
+    computed: {
+        filteredItems() {
+            let vm = this
+            if (!vm.searchKey) {
+                return vm.list
+            }
+
+            return vm.list.filter(obj_category => {
+                return (
+                    vm.isStringContain(obj_category.code, vm.searchKey) ||
+                    vm.isStringContain(obj_category.description, vm.searchKey)
+                )
+            })
         }
     },
     methods: {

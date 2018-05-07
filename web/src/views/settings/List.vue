@@ -18,6 +18,7 @@
                     <v-list-tile avatar
                                  v-for="m in menus"
                                  :key="m.title"
+                                 :class="[currentRouteName == m.to? 'accent lighten-2':'']"
                                  @click="$router.push({name: m.to})">
                         <v-list-tile-avatar>
                             <v-icon color="primary lighten-1">{{ m.icon }}</v-icon>
@@ -73,6 +74,9 @@ export default {
         }
     },
     computed: {
+        currentRouteName() {
+            return this.$route.name
+        },
         currentViewportSize() {
             return this.$store.getters.currentViewportSize
         },
