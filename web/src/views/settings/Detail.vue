@@ -24,7 +24,8 @@
             </v-layout>
         </v-toolbar>
         <v-divider></v-divider>
-        <v-layout>
+        <empty-state v-if="currentRouteName=='settings'"></empty-state>
+        <v-layout v-else>
             <v-flex xs12
                     lg8
                     offset-lg2>
@@ -35,7 +36,11 @@
 </template>
 
 <script>
+import EmptyState from './Empty.vue'
 export default {
+    components: {
+        EmptyState
+    },
     data() {
         return {
             searchKey: null
@@ -46,10 +51,15 @@ export default {
             return this.$route.name
         },
         isShowSearch() {
-            if (this.currentRouteName == 'settings.cost') {
-                return false
+            switch (this.currentRouteName) {
+                case 'settings':
+                case 'settings.cost':
+                case 'settings.empty':
+                    return false
+                default:
+                    return true
+                    break
             }
-            return true
         }
     }
 }

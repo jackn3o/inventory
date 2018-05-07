@@ -36,7 +36,8 @@ const routes = [{
       auth: true
     },
     component: SettingList,
-    children: [{
+    children: [ //
+      {
         path: '/settings/category',
         name: 'settings.category',
         meta: {
