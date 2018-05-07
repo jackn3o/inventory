@@ -3,8 +3,7 @@ import Router from 'vue-router'
 import store from '../store'
 
 
-import Login from '@/components/Login'
-
+import Login from '@/views/Login'
 import Main from '@/views/main'
 //inventory
 import InventoryList from '@/views/inventory/List'
