@@ -25,3 +25,23 @@ npm test
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+
+TEMPLATE launch.json for VS Code
+{
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "Launch",
+        "type": "go",
+        "request": "launch",
+        "mode": "debug",
+        "remotePath": "",
+        "port": 3000,
+        "host": "localhost",
+        "program": "${workspaceRoot}",
+        "env": {},
+        "args": ["--config-file", "inventory.json"],
+        "showLog": true
+    }]
+}

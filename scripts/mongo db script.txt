@@ -1,0 +1,40 @@
+mongod --dbpath "d:\mongodb\data" --logpath "d:\mongodb\logs.txt" --install --serviceName "MongoDB"
+
+db.createUser( { user: "sa", pwd: "p@ssw0rd", roles: [ "userAdminAnyDatabase", "clusterAdmin", "readWriteAnyDatabase" ,"dbAdminAnyDatabase" ] } )
+
+db.auth("sa", "p@ssw0rd")
+
+
+
+db.createUser({user: "sa", pwd: "p@ssw0rd",  roles: [ "readWrite", "dbAdmin"]})
+
+{
+    "app": {
+        "name": "inventory",
+        "host": "localhost:3000",
+        "post": "3000",
+        "apiBase": "/api/v1",
+        "timeout": {
+            "read": 60,
+            "write": 60
+        }
+    },
+    "database": {
+        "connection": {
+            "host": "localhost:27017",
+            "username": "sa",
+            "password": "p@ssw0rd",
+            "timeout": 60
+        },
+        "main": {
+            "name": "inventory"
+        },
+        "master": {
+            "name": "master"
+        },
+        "demo": {
+            "name": "demo"
+        }
+    },
+    "secretKey": "secret"
+}

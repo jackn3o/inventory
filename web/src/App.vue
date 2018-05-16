@@ -2,25 +2,18 @@
     <v-app v-resize="onResize">
         <div class="inner_body"
              :class="appClasses">
-            <v-layout row
-                      fill-height>
-                <v-flex xl10
-                        offset-xl1
-                        xs12>
-                    <router-view></router-view>
-                </v-flex>
-            </v-layout>
+            <router-view></router-view>
         </div>
+        <toast></toast>
     </v-app>
 </template>
 
 <script>
+import Toast from './components/Toast.vue'
 export default {
     name: 'App',
-    data() {
-        return {
-            title: 'Vuetify.js'
-        }
+    components: {
+        Toast
     },
     computed: {
         currentViewportSize() {
@@ -34,7 +27,7 @@ export default {
     },
     methods: {
         onResize() {
-            this.$store.commit('setViewportSize', window.innerWidth)
+            this.$store.dispatch('setViewportSize', window.innerWidth)
         }
     },
     mounted() {
@@ -46,10 +39,17 @@ export default {
 html {
     overflow: hidden;
 }
+html .application {
+    font-family: 'Noto Sans', 'Roboto', sans-serif;
+}
 .inner_body {
     height: 100vh;
     width: 100vw;
-    background: url('./assets/background.jpg')no-repeat center center fixed;
+    background: #888;
+    /* background: url('./assets/background.jpg')no-repeat center center fixed; */
+}
+.relative {
+    position: relative;
 }
 
 .list__tile .list__tile__action > .avatar,

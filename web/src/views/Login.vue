@@ -23,13 +23,15 @@
                             <v-layout>
                                 <v-flex xs10
                                         offset-xs1>
-                                    <v-text-field label="Username"
-                                                  v-model="model.user_name"
-                                                  prepend-icon="person"></v-text-field>
-                                    <v-text-field type="password"
+                                    <v-text-field v-model="model.username"
+                                                  label="Username"
+                                                  prepend-icon="person"
+                                                  :error-messages="validations.username"></v-text-field>
+                                    <v-text-field v-model="model.password"
+                                                  type="password"
                                                   label="Password"
-                                                  v-model="model.password"
-                                                  prepend-icon="lock"></v-text-field>
+                                                  prepend-icon="lock"
+                                                  :error-messages="validations.password"></v-text-field>
                                 </v-flex>
                             </v-layout>
                         </v-card-text>
@@ -60,7 +62,9 @@
 </template>
 
 <script>
+import validator from '@/mixins/validator'
 export default {
+    mixins: [validator],
     data() {
         return {
             model: {
@@ -70,16 +74,6 @@ export default {
         }
     },
     computed: {
-        r_validation() {
-            let obj_model = this.model,
-                obj_validation = {}
-
-            for (var str_key in obj_model) {
-                obj_validation[str_key] = null
-            }
-
-            return r_validation
-        },
         contentBoxClasses() {
             let str_viewportSize = this.$store.getters.currentViewportSize
 
@@ -92,12 +86,14 @@ export default {
     },
     methods: {
         authenticate() {
-            let obj_user = {
-                username: 'test',
-                password: '1111qqqq'
-            }
-            this.axios.post('localhost:8000/authenticate', obj_user).then(obj_response => {
-                console.log(obj_response.data)
+            let vm = this
+            vm.post('/authentication/login', vm.model).then(obj_response => {
+                if (!obj_response || !obj_response.data) {
+                    return
+                }
+                this.$store.dispatch('login', obj_response.data)
+
+                this.$router.push({ name: 'inventory.list' })
             })
         }
     }

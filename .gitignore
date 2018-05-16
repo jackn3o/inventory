@@ -14,5 +14,7 @@ selenium-debug.log
 *.ntvs*
 *.njsproj
 *.sln
+*.exe
 package-lock.json
-inventory.exe
+inventory.json
+debug
