@@ -119,6 +119,8 @@ router.beforeEach((to, from, next) => {
       })
       return
     }
+  } else {
+    //todo 404
   }
 
   next()
