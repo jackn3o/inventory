@@ -6,6 +6,12 @@
                 xs12>
             <v-card height="100%"
                     class="relative elevation-8">
+                <v-progress-linear v-model="progress"
+                                   :active="progress>0"
+                                   indeterminate
+                                   height="4"
+                                   color="primary"
+                                   style="position: absolute; top:0; left:0; margin:0;  z-index:6"></v-progress-linear>
                 <v-navigation-drawer dark
                                      permenant
                                      absolute
@@ -146,6 +152,9 @@ export default {
         }
     },
     computed: {
+        progress() {
+            return this.$store.getters.progress
+        },
         currentUser() {
             return this.$store.getters.currentUser
         }
