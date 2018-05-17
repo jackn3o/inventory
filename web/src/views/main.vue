@@ -92,28 +92,23 @@
                                 </v-card-title>
                                 <v-divider></v-divider>
                                 <v-list dense>
-                                    <v-list-tile avatar>
+                                    <v-list-tile avatar
+                                                 @click="openDialog('password')">
                                         <v-list-tile-avatar>
                                             <v-icon>vpn_key</v-icon>
                                         </v-list-tile-avatar>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Change password</v-list-tile-title>
-                                            <v-list-tile-sub-title></v-list-tile-sub-title>
                                         </v-list-tile-content>
-                                        <v-list-tile-action>
-                                        </v-list-tile-action>
                                     </v-list-tile>
                                     <v-list-tile avatar
-                                                 @click="dialog=true">
+                                                 @click="openDialog('logout')">
                                         <v-list-tile-avatar>
                                             <v-icon>exit_to_app</v-icon>
                                         </v-list-tile-avatar>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Logout</v-list-tile-title>
-                                            <v-list-tile-sub-title></v-list-tile-sub-title>
                                         </v-list-tile-content>
-                                        <v-list-tile-action>
-                                        </v-list-tile-action>
                                     </v-list-tile>
                                 </v-list>
                             </v-card>
@@ -122,7 +117,32 @@
                 </v-navigation-drawer>
                 <v-dialog v-model="dialog"
                           max-width="400px">
-                    <v-card>
+                    <v-card v-if="view=='password'">
+                        <v-card-title class="headline">Reset Password</v-card-title>
+                        <v-card-text>
+                            <v-text-field v-model="model.oldPassword"
+                                          label="Old Password"
+                                          placeholder="Old Password"
+                                          :error-messages="validations.oldPassword"></v-text-field>
+                            <v-text-field v-model="model.newPassword"
+                                          label="New Password"
+                                          placeholder="New Password"
+                                          :error-messages="validations.newPassword"></v-text-field>
+                            <v-text-field v-model="model.confirmPassword"
+                                          label="Confirm Password"
+                                          placeholder="Confirm Password"
+                                          :error-messages="validations.confirmPassword"></v-text-field>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn flat="flat"
+                                   @click.native="dialog = false">No</v-btn>
+                            <v-btn color="primary"
+                                   flat="flat"
+                                   @click.native="ResetPassword">Yes</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                    <v-card v-if="view=='logout'">
                         <v-card-title class="headline">Logout</v-card-title>
                         <v-card-text>Confirm to logout?</v-card-text>
                         <v-card-actions>
@@ -142,13 +162,22 @@
 </template>
 
 <script>
+import validator from '@/mixins/validator'
+
 export default {
+    mixins: [validator],
     data() {
         return {
             mini: true,
             drawer: true,
             dialog: false,
-            menu: false
+            menu: false,
+            view: null,
+            model: {
+                oldPassword: null,
+                newPassword: null,
+                confirmPassword: null
+            }
         }
     },
     computed: {
@@ -160,6 +189,20 @@ export default {
         }
     },
     methods: {
+        openDialog(str_view) {
+            this.view = str_view
+            this.dialog = true
+        },
+        ResetPassword() {
+            let vm = this
+            vm.put(`/users/${vm.currentUser}/password`, vm.model).then(obj_response => {
+                if (!obj_response || !obj_response.data) {
+                    return
+                }
+                this.$store.dispatch('login', obj_response.data)
+                this.$router.push({ name: 'inventory.list' })
+            })
+        },
         logout() {
             this.$store.dispatch('logout')
             this.$router.push({ name: 'login' })
