@@ -19,6 +19,7 @@ Vue.use(Vuetify)
 Vue.use(VueMomentJS, moment)
 Vue.use(VueLodash, lodash)
 Vue.config.productionTip = false
+
 const instance = axios.create(axiosConfig)
 instance.interceptors.request.use(config => {
   store.dispatch('setProgress', 20)
@@ -41,6 +42,14 @@ instance.interceptors.response.use(
   },
   error => {
     store.dispatch('setProgress', 100)
+    //handling for no network
+    if(!error.response){
+      store.dispatch('addToast', {
+        type: 'error',
+        message: error.message
+      })
+      return
+    }
     //redirect to login if unauthorized response
     if (error.response.status === 401) {
       store.dispatch('logout')
