@@ -2,6 +2,7 @@ import * as types from '../mutation_types'
 
 const state = {
     authorized: false,
+    currentUser: null,
     token: null,
 }
 
@@ -24,7 +25,15 @@ const getters = {
                 state.token = JSON.parse(localStorage.getItem('auth')).token;
             }
         }
-        return state.token;
+        return state.token
+    },
+    currentUser(state){
+        if(state.currentUser == null){
+            if (localStorage.getItem('auth')) {
+                state.currentUser = JSON.parse(localStorage.getItem('auth')).username;
+            }
+        }
+        return state.currentUser
     }
 }
 
@@ -39,7 +48,6 @@ const mutations = {
         state.authorized = false;
         state.token = null;
         localStorage.removeItem('auth');
-
     }
 }
 
