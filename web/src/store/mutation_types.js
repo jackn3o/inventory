@@ -5,4 +5,6 @@ export const PUSH_TOAST = 'PUSH_TOAST'
 export const SHIFT_TOAST = 'SHIFT_TOAST'
 export const RESET_TOAST = 'RESET_TOAST'
 
+export const SET_PROGRESS = 'SET_PROGRESS'
+
 export const SET_VIEWPORT_SIZE = "SET_VIEWPORT_SIZE"

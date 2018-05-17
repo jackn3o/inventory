@@ -6,6 +6,12 @@
                 xs12>
             <v-card height="100%"
                     class="relative elevation-8">
+                <v-progress-linear v-model="progress"
+                                   :active="progress>0"
+                                   indeterminate
+                                   height="4"
+                                   color="primary"
+                                   style="position: absolute; top:0; left:0; margin:0;  z-index:6"></v-progress-linear>
                 <v-navigation-drawer dark
                                      permenant
                                      absolute
@@ -58,35 +64,77 @@
                     </v-list>
                     <v-spacer></v-spacer>
                     <v-list>
-                        <v-list-tile avatar>
-                            <v-list-tile-avatar>
-                                <v-dialog v-model="dialog"
-                                          max-width="400px">
-                                    <v-avatar slot="activator"
-                                              size="40px"
+                        <v-menu :nudge-width="200"
+                                v-model="menu"
+                                :nudge-left="60"
+                                offset-x>
+                            <v-list-tile avatar
+                                         slot="activator">
+                                <v-list-tile-avatar>
+                                    <v-avatar size="40px"
                                               color="teal">
-                                        <v-icon>person</v-icon>
+                                        <v-icon color="white">person</v-icon>
                                     </v-avatar>
-                                    <v-card>
-                                        <v-card-title class="headline">Logout</v-card-title>
-                                        <v-card-text>Confirm to logout?</v-card-text>
-                                        <v-card-actions>
-                                            <v-spacer></v-spacer>
-                                            <v-btn flat="flat"
-                                                   @click.native="dialog = false">No</v-btn>
-                                            <v-btn color="primary"
-                                                   flat="flat"
-                                                   @click.native="logout">Yes</v-btn>
-                                        </v-card-actions>
-                                    </v-card>
-                                </v-dialog>
-                            </v-list-tile-avatar>
-                            <v-list-tile-content>
-                                <v-list-tile-title>Admin</v-list-tile-title>
-                            </v-list-tile-content>
-                        </v-list-tile>
+                                </v-list-tile-avatar>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>Admin</v-list-tile-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+                            <v-card>
+                                <v-card-title>
+                                    <v-avatar size="40px"
+                                              color="teal">
+                                        <v-icon color="white">person</v-icon>
+                                    </v-avatar>
+                                    <div class="subheading ml-3">
+                                        {{currentUser}}
+                                    </div>
+                                </v-card-title>
+                                <v-divider></v-divider>
+                                <v-list dense>
+                                    <v-list-tile avatar>
+                                        <v-list-tile-avatar>
+                                            <v-icon>vpn_key</v-icon>
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>Change password</v-list-tile-title>
+                                            <v-list-tile-sub-title></v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                        <v-list-tile-action>
+                                        </v-list-tile-action>
+                                    </v-list-tile>
+                                    <v-list-tile avatar
+                                                 @click="dialog=true">
+                                        <v-list-tile-avatar>
+                                            <v-icon>exit_to_app</v-icon>
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>Logout</v-list-tile-title>
+                                            <v-list-tile-sub-title></v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                        <v-list-tile-action>
+                                        </v-list-tile-action>
+                                    </v-list-tile>
+                                </v-list>
+                            </v-card>
+                        </v-menu>
                     </v-list>
                 </v-navigation-drawer>
+                <v-dialog v-model="dialog"
+                          max-width="400px">
+                    <v-card>
+                        <v-card-title class="headline">Logout</v-card-title>
+                        <v-card-text>Confirm to logout?</v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn flat="flat"
+                                   @click.native="dialog = false">No</v-btn>
+                            <v-btn color="primary"
+                                   flat="flat"
+                                   @click.native="logout">Yes</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
                 <router-view style="position:absolute; top:0; left:80px; width:calc(100% - 80px); height: 100%; z-index:4;"></router-view>
             </v-card>
         </v-flex>
@@ -99,7 +147,16 @@ export default {
         return {
             mini: true,
             drawer: true,
-            dialog: false
+            dialog: false,
+            menu: false
+        }
+    },
+    computed: {
+        progress() {
+            return this.$store.getters.progress
+        },
+        currentUser() {
+            return this.$store.getters.currentUser
         }
     },
     methods: {
