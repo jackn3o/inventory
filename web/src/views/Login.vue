@@ -92,7 +92,6 @@ export default {
                     return
                 }
                 this.$store.dispatch('login', obj_response.data)
-
                 this.$router.push({ name: 'inventory.list' })
             })
         }

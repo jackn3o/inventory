@@ -34,10 +34,10 @@ instance.interceptors.request.use(config => {
   // if (config.headers['Content-Type'] === '') {
   //   config.headers['Content-Type'] = 'application/json'
   // }
-
   if (store.getters.authorized) {
     let token = store.getters.token
     config.headers['Authorization'] = `Bearer ${token}`
+  } else {
   }
 
   return config

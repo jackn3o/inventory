@@ -76,7 +76,7 @@
                                                    @click.native="dialog = false">No</v-btn>
                                             <v-btn color="primary"
                                                    flat="flat"
-                                                   @click.native="dialog = false">Yes</v-btn>
+                                                   @click.native="logout">Yes</v-btn>
                                         </v-card-actions>
                                     </v-card>
                                 </v-dialog>
@@ -101,10 +101,15 @@ export default {
             drawer: true,
             dialog: false
         }
+    },
+    methods: {
+        logout() {
+            this.$store.dispatch('logout')
+            this.$router.push({ name: 'login' })
+        }
     }
 }
 </script>
 
 <style>
-
 </style>
