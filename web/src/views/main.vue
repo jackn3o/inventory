@@ -60,13 +60,55 @@
                     <v-list>
                         <v-list-tile avatar>
                             <v-list-tile-avatar>
-                                <v-dialog v-model="dialog"
-                                          max-width="400px">
+                                <v-menu :nudge-width="200"
+                                        v-model="menu"
+                                        offset-x>
                                     <v-avatar slot="activator"
                                               size="40px"
                                               color="teal">
-                                        <v-icon>person</v-icon>
+                                        <v-icon color="white">person</v-icon>
                                     </v-avatar>
+
+                                    <v-card>
+                                        <v-card-title>
+                                            <v-avatar size="40px"
+                                                      color="teal">
+                                                <v-icon color="white">person</v-icon>
+                                            </v-avatar>
+                                            <div class="subheading ml-3">
+                                                {{currentUser}}
+                                            </div>
+                                        </v-card-title>
+                                        <v-divider></v-divider>
+                                        <v-list dense>
+                                            <v-list-tile avatar>
+                                                <v-list-tile-avatar>
+                                                    <v-icon>vpn_key</v-icon>
+                                                </v-list-tile-avatar>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title>Change password</v-list-tile-title>
+                                                    <v-list-tile-sub-title></v-list-tile-sub-title>
+                                                </v-list-tile-content>
+                                                <v-list-tile-action>
+                                                </v-list-tile-action>
+                                            </v-list-tile>
+                                            <v-list-tile avatar
+                                                         @click="dialog=true">
+                                                <v-list-tile-avatar>
+                                                    <v-icon>exit_to_app</v-icon>
+                                                </v-list-tile-avatar>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title>Logout</v-list-tile-title>
+                                                    <v-list-tile-sub-title></v-list-tile-sub-title>
+                                                </v-list-tile-content>
+                                                <v-list-tile-action>
+                                                </v-list-tile-action>
+                                            </v-list-tile>
+                                        </v-list>
+                                    </v-card>
+                                </v-menu>
+                                <v-dialog v-model="dialog"
+                                          max-width="400px">
                                     <v-card>
                                         <v-card-title class="headline">Logout</v-card-title>
                                         <v-card-text>Confirm to logout?</v-card-text>
@@ -99,7 +141,13 @@ export default {
         return {
             mini: true,
             drawer: true,
-            dialog: false
+            dialog: false,
+            menu: false
+        }
+    },
+    computed: {
+        currentUser() {
+            return this.$store.getters.currentUser
         }
     },
     methods: {
