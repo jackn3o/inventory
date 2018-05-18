@@ -6,7 +6,7 @@ import (
 	configuration "../../base/configuration"
 	"../../base/connector"
 	base "../../base/service"
-	controller "../../controllers/user"
+	controller "../../controllers/authentication"
 )
 
 // userService is one router service.

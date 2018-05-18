@@ -121,14 +121,17 @@
                         <v-card-title class="headline">Reset Password</v-card-title>
                         <v-card-text>
                             <v-text-field v-model="model.oldPassword"
+                                          type="password"
                                           label="Old Password"
                                           placeholder="Old Password"
                                           :error-messages="validations.oldPassword"></v-text-field>
                             <v-text-field v-model="model.newPassword"
+                                          type="password"
                                           label="New Password"
                                           placeholder="New Password"
                                           :error-messages="validations.newPassword"></v-text-field>
                             <v-text-field v-model="model.confirmPassword"
+                                          type="password"
                                           label="Confirm Password"
                                           placeholder="Confirm Password"
                                           :error-messages="validations.confirmPassword"></v-text-field>
@@ -199,8 +202,9 @@ export default {
                 if (!obj_response || !obj_response.data) {
                     return
                 }
-                this.$store.dispatch('login', obj_response.data)
-                this.$router.push({ name: 'inventory.list' })
+                this.$store.dispatch('logout')
+               
+                this.$store.dispatch('addToast', 'Please login with new password')
             })
         },
         logout() {
