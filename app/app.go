@@ -10,6 +10,7 @@ import (
 	authenticationservice "../services/authentication"
 	itemsservice "../services/items"
 	settingsservice "../services/settings"
+	userservice "../services/user"
 
 	"../base/configuration"
 	"../base/connector"
@@ -61,7 +62,7 @@ func setupRouter(ctx context.Context, config configuration.Config, router *mux.R
 
 	apiRouter := router.PathPrefix(config.GetString(configuration.AppAPIBase)).Subrouter()
 	service.Register(apiRouter, "/authentication", authenticationservice.New(store, config))
-	service.Register(apiRouter, "/public", authenticationservice.New(store, config))
+	service.Register(apiRouter, "/users", userservice.New(store, config), jwtmw)
 	service.Register(apiRouter, "/items", itemsservice.New(store, config), jwtmw)
 	service.Register(apiRouter, "/settings", settingsservice.New(store, config), jwtmw)
 
