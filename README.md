@@ -1,10 +1,16 @@
 # inventory
 
-> A Vue.js project
+> A Vue.js + Go project
 
-## Build Setup
+## Web Config Setup
+
+
+## Web Build Setup
 
 ``` bash
+# to web directory
+cd web
+
 # install dependencies
 npm install
 
@@ -26,6 +32,58 @@ npm test
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
+
+## Go Configuration Setup
+```bash
+
+# configuration file
+in root directory create a inventory.json
+
+{
+    "app": {
+        "name": "inventory",
+        "host": "localhost:3000",
+        "post": "3000",
+        "apiBase": "/api/v1",
+        "timeout": {
+            "read": 60,
+            "write": 60
+        }
+    },
+    "database": {
+        "connection": {
+            "host": "localhost:27017",
+            "username": "sa",
+            "password": "p@ssw0rd",
+            "timeout": 60
+        },
+        "main": {
+            "name": "inventory"
+        },
+        "master": {
+            "name": "master"
+        },
+        "demo": {
+            "name": "demo"
+        }
+    },
+    "secretKey": "secret"
+}
+
+```
+
+## Go Build Setup
+
+```bash
+# build go project
+go build
+
+
+# run go prohect
+.\inventory (window)
+./inventory (linux)
+
+```
 
 TEMPLATE launch.json for VS Code
 {
