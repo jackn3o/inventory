@@ -2,9 +2,6 @@
 
 > A Vue.js + Go project
 
-## Web Config Setup
-
-
 ## Web Build Setup
 
 ``` bash
@@ -31,6 +28,14 @@ npm test
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+## Web Config Setup
+
+``` bash
+a config.js require in web directory for API url path
+
+```
+
 
 
 ## Go Configuration Setup
@@ -85,7 +90,10 @@ go build
 
 ```
 
-TEMPLATE launch.json for VS Code
+
+## TEMPLATE launch.json for VS Code
+
+```bash
 {
     "version": "0.2.0",
     "configurations": [
@@ -103,3 +111,5 @@ TEMPLATE launch.json for VS Code
         "showLog": true
     }]
 }
+
+```
