@@ -2,8 +2,10 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	service "../base/service"
@@ -17,17 +19,21 @@ import (
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/magicsoft-asia/vanda/lib/log"
 	"github.com/rs/cors"
 )
 
 // Start up for app
 func Start(config configuration.Config) {
 	rootContext, rootCancel := context.WithCancel(context.Background())
+	logger := log.NewLogger("app")
 
 	appListenHost := config.GetString(configuration.AppListenHost)
 	router := mux.NewRouter()
 
+	logger.Info("action=setup-router")
 	setupRouter(rootContext, config, router)
+
 	corsmw := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
@@ -41,8 +47,36 @@ func Start(config configuration.Config) {
 		Addr:         appListenHost,
 	}
 
-	server.ListenAndServe()
-	fmt.Printf("%s running on %s", "app", appListenHost)
+	go func() {
+		logger.Fatal(server.ListenAndServe())
+	}()
+
+	// setup logger
+	// verify log level value
+	configLogLevel := config.Get(configuration.LogLevel)
+
+	switch configLogLevel.(type) {
+	case log.LogLevel:
+		log.SetLogLevel(configLogLevel.(log.LogLevel))
+		break
+	case int:
+		log.SetLogLevel(log.LogLevel(configLogLevel.(int)))
+		break
+	}
+
+	for {
+		logger.Infof("%s running on %s", "app", appListenHost)
+		sig := waitForSignals()
+
+		// must survive sighub signal
+		if sig == syscall.SIGHUP {
+			continue
+		}
+
+		break
+	}
+
+	logger.Info("shutting down")
 
 	server.Shutdown(rootContext)
 	rootCancel()
@@ -66,4 +100,15 @@ func setupRouter(ctx context.Context, config configuration.Config, router *mux.R
 	service.Register(apiRouter, "/items", itemsservice.New(store, config), jwtmw)
 	service.Register(apiRouter, "/settings", settingsservice.New(store, config), jwtmw)
 
+}
+
+func waitForSignals() os.Signal {
+	sink := make(chan os.Signal, 1)
+	defer close(sink)
+
+	// wait for signal
+	signal.Notify(sink, signals...)
+	defer signal.Ignore(signals...)
+
+	return <-sink
 }

@@ -25,8 +25,11 @@ const (
 	DatabasePassword = "database.connection.password"
 	DatabaseTimeout  = "database.connection.timeout"
 
-	MainDatabaseName   = "database.main.name"
-	DemoDatabaseName   = "database.demo.name"
+	MainDatabaseName = "database.main.name"
+	DemoDatabaseName = "database.demo.name"
+
+	LogLevel = "log.level"
+
 	MasterDatabaseName = "database.master.name"
 
 	SecretKey = "secretKey"
@@ -209,10 +212,11 @@ func New(appName string, cmd *cobra.Command, configDir ...string) (Config, error
 	// cfg.FlagString(OptSSLCertificateKey, "", "SSL Certificate Key")
 	// cfg.FlagString(OptMode, "debug", "Runtime mode (release, debug)")
 	cfg.FlagString(AppAPIBase, "/api/v1", "API base")
-	// cfg.FlagString(OptSecretKey, "97d6867beb4d4726c5958e03e9337b4599ae3e43a49433a07eea569eb473fcfb", "Security secret key")
+	cfg.FlagString(SecretKey, "secret", "Security secret key")
 
+	// logger
 	// cfg.FlagString(OptLogFileName, "", "Logging output file name")
-	// cfg.FlagInt(OptLogLevel, 0, "Logging level output") // only log panic panic
+	cfg.FlagInt(LogLevel, 0, "Logging level output") // only log panic panic
 	// cfg.FlagBool(OptLogEnableRotation, true, "Enable logging file auto rotation")
 	// cfg.FlagBool(OptEnableSyslog, false, "Enable logging to syslog")
 	// cfg.FlagString(OptSyslogNetwork, "", "Syslog network (tcp or udp)")
@@ -236,11 +240,9 @@ func New(appName string, cmd *cobra.Command, configDir ...string) (Config, error
 	// cfg.FlagString(OptSessionCookieName, "sid", "Session Cookie Name")
 	// cfg.FlagString(OptPushChanel, "events", "Push notification channel")
 
-	// cfg.FlagString(OptSQLURI, "postgre://localhost:5432/test?sslmode=disable", "sql (postgres) url")
-	// cfg.FlagInt(OptSQLMaxWait, 30, "SQL connection timeout")
-	// cfg.FlagInt(OptSQLMaxOpen, 10, "Maximum opened sql connection")
-	// cfg.FlagInt(OptSQLMaxIdle, 8, "Maximum idle sql connection")
-	// cfg.FlagInt(OptSQLIdleTimeout, 10, "SQL idle time before disconnected")
+	// database and key value store
+	cfg.FlagString(DatabaseHost, "localhost:27017", "sql (mongo) url")
+	cfg.FlagInt(DatabaseTimeout, 60, "mongo timeout in second")
 
 	// cfg.FlagString(OptKvURI, "localhost:6379", "KV (redis) url")
 	// cfg.FlagString(OptKvPassword, "", "KV (redis) password")
