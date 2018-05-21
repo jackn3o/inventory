@@ -1,4 +1,4 @@
-package logger
+package log
 
 import (
 	"io"
@@ -9,6 +9,7 @@ import (
 
 type LogLevel int
 
+// Logger level
 const (
 	PanicLevel LogLevel = iota
 	FatalLevel

@@ -28,6 +28,7 @@ func (c *Controller) CreateOutlet() http.Handler {
 		outlet := &Outlet{}
 		err := u.UnmarshalWithValidation(outlet)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
@@ -37,6 +38,7 @@ func (c *Controller) CreateOutlet() http.Handler {
 		collection := session.DB(c.databaseName).C(OutletSettingCollection)
 		count, err := collection.Find(bson.M{"code": outlet.Code}).Count()
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -53,6 +55,7 @@ func (c *Controller) CreateOutlet() http.Handler {
 		err = collection.Insert(outlet)
 
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -76,6 +79,7 @@ func (c *Controller) GetOutlets() http.Handler {
 			Sort("description").
 			All(&outlets)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -100,6 +104,7 @@ func (c *Controller) GetOutletByID() http.Handler {
 			Select(bson.M{"code": 1, "description": 1}).
 			One(&outlet)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -123,12 +128,14 @@ func (c *Controller) UpdateOutlet() http.Handler {
 		outlet := &Outlet{}
 		err := u.UnmarshalWithValidation(outlet)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
 
 		isExist, err := c.isKeyFieldsExist(outletID, OutletSettingCollection, outlet.Code, outlet.Description)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -151,6 +158,7 @@ func (c *Controller) UpdateOutlet() http.Handler {
 			"modifiedBy":   "todo",
 		}}
 		if err := collection.Update(selector, updator); err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -177,6 +185,7 @@ func (c *Controller) DeleteOutlet() http.Handler {
 		collection := session.DB(c.databaseName).C(OutletSettingCollection)
 		_, err := collection.RemoveAll(bson.M{"_id": bson.ObjectIdHex(outletID)})
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}

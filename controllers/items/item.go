@@ -33,6 +33,7 @@ func (c *Controller) CreateItem() http.Handler {
 		item := &Item{}
 		err := u.UnmarshalWithValidation(item)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
@@ -42,6 +43,7 @@ func (c *Controller) CreateItem() http.Handler {
 		collection := session.DB(c.databaseName).C(ItemsCollection)
 		count, err := collection.Find(bson.M{"code": item.Code}).Count()
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -58,6 +60,7 @@ func (c *Controller) CreateItem() http.Handler {
 		err = collection.Insert(item)
 
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("code exist", http.StatusInternalServerError)
 			panic(err)
 		}
@@ -81,6 +84,7 @@ func (c *Controller) GetItems() http.Handler {
 			Sort("description").
 			All(&items)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("verification failed", http.StatusInternalServerError)
 			return
 		}

@@ -28,12 +28,14 @@ func (c *Controller) CreateColor() http.Handler {
 		color := &Color{}
 		err := u.UnmarshalWithValidation(color)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
 
 		isExist, err := c.isDescriptionExist("", color.Description)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -54,6 +56,7 @@ func (c *Controller) CreateColor() http.Handler {
 		err = collection.Insert(color)
 
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -76,7 +79,9 @@ func (c *Controller) GetColors() http.Handler {
 			Select(bson.M{"description": 1, "hex": 1}).
 			Sort("description").
 			All(&colors)
+
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -108,6 +113,7 @@ func (c *Controller) GetColorByID() http.Handler {
 			One(&dto)
 
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something wrong, please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -131,12 +137,14 @@ func (c *Controller) UpdateColor() http.Handler {
 		color := &Color{}
 		err := u.UnmarshalWithValidation(color)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
 
 		isExist, err := c.isDescriptionExist(colorID, color.Description)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -159,6 +167,7 @@ func (c *Controller) UpdateColor() http.Handler {
 			"modifiedBy":   "todo",
 		}}
 		if err := collection.Update(selector, updator); err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -185,6 +194,7 @@ func (c *Controller) DeleteColor() http.Handler {
 		collection := session.DB(c.databaseName).C(ColorSettingCollection)
 		_, err := collection.RemoveAll(bson.M{"_id": bson.ObjectIdHex(colorID)})
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -213,6 +223,7 @@ func (c *Controller) isDescriptionExist(id string, description string) (bool, er
 	}
 	count, err := collection.Find(selector).Count()
 	if err != nil {
+		c.logger.Error(err)
 		return false, err
 	}
 

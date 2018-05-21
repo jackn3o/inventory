@@ -8,6 +8,7 @@ import (
 
 	configuration "../../base/configuration"
 	"../../base/connector"
+	"../../base/log"
 	utility "../../base/utilities"
 	jwt "github.com/dgrijalva/jwt-go"
 	"gopkg.in/mgo.v2/bson"
@@ -35,6 +36,7 @@ type TokenResponseDto struct {
 type Controller struct {
 	store  *connector.Store
 	config configuration.Config
+	logger log.Logger
 }
 
 // New method is a constructor for controller.
@@ -42,6 +44,7 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 	return &Controller{
 		store:  store,
 		config: config,
+		logger: log.New("authentication-controller"),
 	}
 }
 
@@ -53,6 +56,7 @@ func (c *Controller) Authenticate() http.Handler {
 		dto := &LoginDto{}
 		err := u.UnmarshalWithValidation(dto)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
@@ -71,6 +75,7 @@ func (c *Controller) Authenticate() http.Handler {
 		var user LoginDto
 		err = userCollection.Find(selector).One(&user)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("User not found", http.StatusBadRequest)
 			return
 		}

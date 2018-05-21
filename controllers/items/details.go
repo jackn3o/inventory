@@ -59,6 +59,7 @@ func (c *Controller) AddDetail() http.Handler {
 		detail := &ItemDetail{}
 		err := u.UnmarshalWithValidation(detail)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
@@ -89,6 +90,7 @@ func (c *Controller) AddDetail() http.Handler {
 
 		err = collection.Update(selector, updator)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -120,6 +122,7 @@ func (c *Controller) GetItemDetailsByID() http.Handler {
 			One(&dto)
 
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something wrong, please try again later", http.StatusInternalServerError)
 			return
 		}

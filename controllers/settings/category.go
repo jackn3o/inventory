@@ -28,12 +28,14 @@ func (c *Controller) CreateCategory() http.Handler {
 		category := &Category{}
 		err := u.UnmarshalWithValidation(category)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
 
 		isExist, err := c.isKeyFieldsExist("", CategorySettingCollection, category.Code, category.Description)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -49,6 +51,7 @@ func (c *Controller) CreateCategory() http.Handler {
 		collection := session.DB(c.databaseName).C(CategorySettingCollection)
 		count, err := collection.Find(bson.M{"code": category.Code}).Count()
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -65,6 +68,7 @@ func (c *Controller) CreateCategory() http.Handler {
 		err = collection.Insert(category)
 
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -97,6 +101,7 @@ func (c *Controller) GetCategories() http.Handler {
 			Sort(sortParam).
 			All(&categories)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -121,6 +126,7 @@ func (c *Controller) GetCategoryByID() http.Handler {
 			Select(bson.M{"code": 1, "description": 1}).
 			One(&categories)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -144,12 +150,14 @@ func (c *Controller) UpdateCategory() http.Handler {
 		category := &Category{}
 		err := u.UnmarshalWithValidation(category)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
 
 		isExist, err := c.isKeyFieldsExist(categoryID, CategorySettingCollection, category.Code, category.Description)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
@@ -198,6 +206,7 @@ func (c *Controller) DeleteCategory() http.Handler {
 		collection := session.DB(c.databaseName).C(CategorySettingCollection)
 		_, err := collection.RemoveAll(bson.M{"_id": bson.ObjectIdHex(categoryID)})
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}

@@ -39,6 +39,7 @@ func (c *Controller) ChangePassword() http.Handler {
 		dto := &ResetPasswordDto{}
 		err := u.UnmarshalWithValidation(dto)
 		if err != nil {
+			c.logger.Warn(err)
 			u.WriteJSONError(err, http.StatusBadRequest)
 			return
 		}
@@ -62,6 +63,7 @@ func (c *Controller) ChangePassword() http.Handler {
 		var user User
 		err = userCollection.Find(selector).One(&user)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("User not found", http.StatusBadRequest)
 			return
 		}
@@ -74,6 +76,7 @@ func (c *Controller) ChangePassword() http.Handler {
 
 		newPassword, err := hashPassword(dto.NewPassword)
 		if err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusBadRequest)
 			return
 		}
@@ -85,6 +88,7 @@ func (c *Controller) ChangePassword() http.Handler {
 		}}
 
 		if err := userCollection.Update(selector, updator); err != nil {
+			c.logger.Error(err)
 			u.WriteJSONError("Something Wrong, Please try again later", http.StatusInternalServerError)
 			return
 		}
