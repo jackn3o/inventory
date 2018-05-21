@@ -16,17 +16,17 @@ import (
 
 	"../base/configuration"
 	"../base/connector"
+	"../base/log"
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-	"github.com/magicsoft-asia/vanda/lib/log"
 	"github.com/rs/cors"
 )
 
 // Start up for app
 func Start(config configuration.Config) {
 	rootContext, rootCancel := context.WithCancel(context.Background())
-	logger := log.NewLogger("app")
+	logger := log.New("app")
 
 	appListenHost := config.GetString(configuration.AppListenHost)
 	router := mux.NewRouter()
@@ -34,12 +34,14 @@ func Start(config configuration.Config) {
 	logger.Info("action=setup-router")
 	setupRouter(rootContext, config, router)
 
+	logger.Info("action=setup-cors")
 	corsmw := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"Content-Type", "Origin", "Authorization", "X-Client"},
 		AllowedMethods:   []string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"},
 	})
+
 	server := http.Server{
 		ReadTimeout:  config.GetDuration(configuration.AppReadTimeout) * time.Second,
 		WriteTimeout: config.GetDuration(configuration.AppWriteTimeout) * time.Second,
