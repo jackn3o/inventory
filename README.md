@@ -80,6 +80,11 @@ in root directory create a inventory.json
 ## Go Build Setup
 
 ```bash
+# get dependencies
+glide install (get glide 1st if dont have)
+
+curl https://glide.sh/get | sh
+
 # build go project
 go build
 
