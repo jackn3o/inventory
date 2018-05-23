@@ -1,0 +1,23 @@
+package: .
+import:
+- package: github.com/Sirupsen/logrus
+- package: github.com/asaskevich/govalidator
+- package: github.com/auth0/go-jwt-middleware
+- package: github.com/dgrijalva/jwt-go
+- package: github.com/garyburd/redigo
+  subpackages:
+  - redis
+- package: github.com/go-mgo/mgo
+- package: github.com/gorilla/mux
+- package: github.com/rs/cors
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: golang.org/x/crypto
+  subpackages:
+  - bcrypt
+- package: gopkg.in/mgo.v2
+  subpackages:
+  - bson
+- package: gopkg.in/mgo.v2-unstable
+  subpackages:
+  - bson
