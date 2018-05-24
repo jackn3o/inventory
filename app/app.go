@@ -20,13 +20,14 @@ import (
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/natefinch/lumberjack"
 	"github.com/rs/cors"
 )
 
 // Start up for app
 func Start(config configuration.Config) {
+	logger := log.New()
 	rootContext, rootCancel := context.WithCancel(context.Background())
-	logger := log.New("app")
 
 	appListenHost := config.GetString(configuration.AppListenHost)
 	router := mux.NewRouter()
@@ -58,12 +59,29 @@ func Start(config configuration.Config) {
 	configLogLevel := config.Get(configuration.LogLevel)
 
 	switch configLogLevel.(type) {
-	case log.LogLevel:
-		log.SetLogLevel(configLogLevel.(log.LogLevel))
+	case log.Level:
+		log.SetLogLevel(configLogLevel.(log.Level))
 		break
 	case int:
-		log.SetLogLevel(log.LogLevel(configLogLevel.(int)))
+		log.SetLogLevel(log.Level(configLogLevel.(int)))
 		break
+	}
+
+	var logRotator *lumberjack.Logger
+	fn := "test"
+	sz := 1000
+	rotationEnabled := true
+	if sz == 0 {
+		sz = 1
+	}
+
+	// log to file
+	if fn != "" {
+		logRotator = &lumberjack.Logger{
+			Filename: fn,
+			MaxSize:  sz,
+		}
+		log.SetLogOutput(logRotator)
 	}
 
 	for {
@@ -72,6 +90,12 @@ func Start(config configuration.Config) {
 
 		// must survive sighub signal
 		if sig == syscall.SIGHUP {
+			if logRotator != nil && rotationEnabled {
+				logger.Debug("action=rotate-log")
+				if err := logRotator.Rotate(); err != nil {
+					logger.Error(err)
+				}
+			}
 			continue
 		}
 

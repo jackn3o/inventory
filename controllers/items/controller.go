@@ -20,7 +20,7 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 		databaseName: config.GetString(configuration.MainDatabaseName),
 		store:        store,
 		config:       config,
-		logger:       log.New("items-controller"),
+		logger:       log.New(),
 	}
 }
 

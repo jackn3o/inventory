@@ -44,7 +44,7 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 	return &Controller{
 		store:  store,
 		config: config,
-		logger: log.New("authentication-controller"),
+		logger: log.New(),
 	}
 }
 
