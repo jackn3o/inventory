@@ -28,7 +28,9 @@ const (
 	MainDatabaseName = "database.main.name"
 	DemoDatabaseName = "database.demo.name"
 
-	LogLevel = "log.level"
+	LogDir            = "log.dir"
+	LogLevel          = "log.level"
+	LogEnableRotation = "log.enableRotation"
 
 	MasterDatabaseName = "database.master.name"
 
@@ -216,8 +218,9 @@ func New(appName string, cmd *cobra.Command, configDir ...string) (Config, error
 
 	// logger
 	// cfg.FlagString(OptLogFileName, "", "Logging output file name")
+	cfg.FlagString(LogDir, "/eventlog", "Logging output dir")
 	cfg.FlagInt(LogLevel, 0, "Logging level output") // only log panic panic
-	// cfg.FlagBool(OptLogEnableRotation, true, "Enable logging file auto rotation")
+	cfg.FlagBool(LogEnableRotation, true, "Enable logging file auto rotation")
 	// cfg.FlagBool(OptEnableSyslog, false, "Enable logging to syslog")
 	// cfg.FlagString(OptSyslogNetwork, "", "Syslog network (tcp or udp)")
 	// cfg.FlagString(OptSyslogAddress, "", "Syslog address, use empty string for local syslog")
