@@ -94,7 +94,7 @@
 
 <script>
 import commonMethods from '@/mixins/common_methods.js'
-import AddInventory from './add.vue'
+import AddInventory from './Add.vue'
 
 export default {
     components: {
