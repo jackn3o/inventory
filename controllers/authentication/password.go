@@ -18,13 +18,6 @@ type ResetPasswordDto struct {
 	ConfirmPassword string `bson:"confirmPassword" json:"confirmPassword" valid:"required"`
 }
 
-// User dto
-type User struct {
-	ID       bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
-	Username string        `bson:"username" json:"username" valid:"required"`
-	Password string        `bson:"password" json:"password" valid:"required"`
-}
-
 // ChangePassword login criteria
 func (c *Controller) ChangePassword() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {

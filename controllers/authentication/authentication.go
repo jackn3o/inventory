@@ -25,6 +25,17 @@ type LoginDto struct {
 	Password string `bson:"password" json:"password" valid:"required"`
 }
 
+// User model
+type User struct {
+	ID           bson.ObjectId `bson:"_id,omitempty" json:"_id" valid:"-"`
+	Username     string        `bson:"username" json:"username" valid:"required"`
+	Password     string        `bson:"password" json:"password" valid:"required"`
+	CreatedDate  *time.Time    `bson:"createdDate"`
+	CreatedBy    string        `bson:"createBy"`
+	ModifiedDate *time.Time    `bson:"modifiedDate,omitempty"`
+	ModifiedBy   string        `bson:"modifiedBy,omitempty"`
+}
+
 // TokenResponseDto ...
 type TokenResponseDto struct {
 	Username  string `json:"username"`
@@ -65,7 +76,6 @@ func (c *Controller) Authenticate() http.Handler {
 		defer userSession.Close()
 
 		// Generate "hash" from request password
-
 		masterDatabaseName := c.config.GetString(configuration.MasterDatabaseName)
 		userCollection := userSession.DB(masterDatabaseName).C(UsersCollection)
 		selector := bson.M{
@@ -75,9 +85,18 @@ func (c *Controller) Authenticate() http.Handler {
 		var user LoginDto
 		err = userCollection.Find(selector).One(&user)
 		if err != nil {
-			c.logger.Error(err)
-			u.WriteJSONError("User not found", http.StatusBadRequest)
-			return
+			if dto.Username == "admin" {
+				err := c.createDefaultAdminUser(masterDatabaseName)
+				if err != nil {
+					c.logger.Warn(err)
+					u.WriteJSONError(err, http.StatusBadRequest)
+					return
+				}
+			} else {
+				c.logger.Error(err)
+				u.WriteJSONError("User not found", http.StatusBadRequest)
+				return
+			}
 		}
 
 		isMatch := checkPasswordHash(dto.Password, user.Password)
@@ -115,4 +134,25 @@ func (c *Controller) generateToken(username string, expiredAt int64) string {
 	tokenString, _ := token.SignedString([]byte(c.config.GetString(configuration.SecretKey)))
 
 	return tokenString
+}
+
+func (c *Controller) createDefaultAdminUser(masterDatabaseName string) error {
+	var user User
+	user.ID = bson.NewObjectId()
+	user.Username = "admin"
+
+	defaultPassword, err := hashPassword("p@ssw0rd")
+	if err != nil {
+		return err
+	}
+
+	user.Password = defaultPassword
+	userSession := c.store.DB.Copy()
+	userCollection := userSession.DB(masterDatabaseName).C(UsersCollection)
+
+	err = userCollection.Insert(user)
+	if err != nil {
+		return err
+	}
+	return nil
 }
