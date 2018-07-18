@@ -33,6 +33,11 @@ const (
 	MasterDatabaseName = "database.master.name"
 
 	SecretKey = "secretKey"
+
+	AutoInit              = "autoInit"
+	DefaultPassword       = "defaultPassword"
+	DefaultMasterUsername = "defaultMasterUsername"
+	DefaultDemoUsername   = "defaultDemoUsername"
 )
 
 // Config is duplicate of viper interface
@@ -244,6 +249,11 @@ func New(appName string, cmd *cobra.Command, configDir ...string) (Config, error
 	cfg.FlagString(DatabaseHost, "localhost:27017", "sql (mongo) url")
 	cfg.FlagInt(DatabaseTimeout, 60, "mongo timeout in second")
 
+	// auto initialization for user
+	cfg.FlagBool(AutoInit, true, "auto initialize if new setup")
+	cfg.FlagString(DefaultPassword, "p@ssw0rd", "default user password")
+	cfg.FlagString(DefaultMasterUsername, "admin", "default master username")
+	cfg.FlagString(DefaultDemoUsername, "demo", "default demo username")
 	// cfg.FlagString(OptKvURI, "localhost:6379", "KV (redis) url")
 	// cfg.FlagString(OptKvPassword, "", "KV (redis) password")
 	// cfg.FlagInt(OptKvMaxOpen, 10, "KV (redis) max open")
