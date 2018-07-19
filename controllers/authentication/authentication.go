@@ -86,12 +86,14 @@ func (c *Controller) Authenticate() http.Handler {
 		err = userCollection.Find(selector).One(&user)
 		if err != nil {
 			if dto.Username == "admin" {
-				err := c.createDefaultAdminUser(masterDatabaseName)
+				user, err := c.createDefaultAdminUser(masterDatabaseName)
 				if err != nil {
 					c.logger.Warn(err)
 					u.WriteJSONError(err, http.StatusBadRequest)
 					return
 				}
+				//todo use user to login
+
 			} else {
 				c.logger.Error(err)
 				u.WriteJSONError("User not found", http.StatusBadRequest)
@@ -136,23 +138,30 @@ func (c *Controller) generateToken(username string, expiredAt int64) string {
 	return tokenString
 }
 
-func (c *Controller) createDefaultAdminUser(masterDatabaseName string) error {
+func (c *Controller) createDefaultAdminUser(masterDatabaseName string) (User, error) {
 	var user User
-	user.ID = bson.NewObjectId()
-	user.Username = "admin"
 
 	defaultPassword, err := hashPassword("p@ssw0rd")
 	if err != nil {
-		return err
+		return user, err
 	}
 
-	user.Password = defaultPassword
+	timeNow := time.Now()
+	user = User{
+		ID:          bson.NewObjectId(),
+		Username:    "admin",
+		Password:    defaultPassword,
+		CreatedBy:   "system",
+		CreatedDate: &timeNow,
+	}
+
 	userSession := c.store.DB.Copy()
 	userCollection := userSession.DB(masterDatabaseName).C(UsersCollection)
 
 	err = userCollection.Insert(user)
 	if err != nil {
-		return err
+		return user, err
 	}
-	return nil
+
+	return user, nil
 }
