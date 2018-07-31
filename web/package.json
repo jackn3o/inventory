@@ -19,7 +19,7 @@
     "vue-momentjs": "^0.1.1",
     "vue-router": "^3.0.1",
     "vue-swatches": "^1.0.1",
-    "vuetify": "^1.0.18",
+    "vuetify": "^1.1.8",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
