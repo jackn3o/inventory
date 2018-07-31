@@ -131,6 +131,48 @@ func (c *Controller) GetItemDetailsByID() http.Handler {
 	})
 }
 
+// GetItemsDetailsByIDAndDateRange ...
+func (c *Controller) GetItemsDetailsByIDAndDateRange() http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		u := utility.New(writer, req)
+
+		itemID := mux.Vars(req)["id"]
+		if len(itemID) <= 0 {
+			u.WriteJSONError("ID is require", http.StatusBadRequest)
+			return
+		}
+
+		fromDate := mux.Vars(req)["from"]
+		if len(fromDate) <= 0 {
+			u.WriteJSONError("From Date is require", http.StatusBadRequest)
+			return
+		}
+		toDate := mux.Vars(req)["to"]
+		if len(toDate) <= 0 {
+			u.WriteJSONError("To Date is require", http.StatusBadRequest)
+			return
+		}
+
+		session := c.store.DB.Copy()
+		defer session.Close()
+
+		var dto DetailResponseDto
+		collection := session.DB(c.databaseName).C(ItemsCollection)
+		err := collection.
+			FindId(bson.ObjectIdHex(itemID)).
+			Select(bson.M{"code": 1, "description": 1, "balanceQuantity": 1, "balanceCost": 1, "details": 1}).
+			One(&dto)
+
+		if err != nil {
+			c.logger.Error(err)
+			u.WriteJSONError("Something wrong, please try again later", http.StatusInternalServerError)
+			return
+		}
+
+		u.WriteJSON(dto)
+	})
+}
+
 func calculateCostAndBalance(costAndBalance CostAndBalance, detail *ItemDetail) CostAndBalance {
 
 	lastUnitCost := costAndBalance.UnitCost
