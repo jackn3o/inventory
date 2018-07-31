@@ -1,7 +1,8 @@
 <template>
     <v-menu ref="menu"
-            :close-on-content-click="false"
             v-model="menu"
+            :close-on-content-click="false"
+            :close-on-click="false"
             :nudge-right="nudgeRight"
             lazy
             transition="scale-transition"
@@ -40,7 +41,9 @@ export default {
         nudgeTop: { type: Number, default: 0 },
         nudgeBottom: { type: Number, default: 0 },
         nudgeLeft: { type: Number, default: 0 },
-        nudgeRight: { type: Number, default: 0 }
+        nudgeRight: { type: Number, default: 0 },
+        startWithYear: { type: Boolean, default: false },
+        closeOnContentClick: { type: Boolean, default: false }
     },
     data: () => ({
         date: null,
@@ -48,7 +51,8 @@ export default {
     }),
     watch: {
         menu(val) {
-            val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
+            let vm = this
+            val && vm.startWithYear && vm.$nextTick(() => (vm.$refs.picker.activePicker = 'YEAR'))
         }
     },
     methods: {
