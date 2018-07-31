@@ -3,6 +3,7 @@ package authentication
 // https://auth0.com/blog/authentication-in-golang/
 // Import our dependencies. We'll use the standard http library as well as the gorilla router for this app
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -85,6 +86,7 @@ func (c *Controller) Authenticate() http.Handler {
 		var user LoginDto
 		err = userCollection.Find(selector).One(&user)
 		if err != nil {
+			// todo: initialization to have another check in app run, temporary put in login
 			if dto.Username == "admin" {
 				user, err := c.createDefaultAdminUser(masterDatabaseName)
 				if err != nil {
@@ -93,6 +95,8 @@ func (c *Controller) Authenticate() http.Handler {
 					return
 				}
 				//todo use user to login
+
+				fmt.Println(user)
 
 			} else {
 				c.logger.Error(err)
