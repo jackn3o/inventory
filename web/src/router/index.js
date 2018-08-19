@@ -15,6 +15,9 @@ import Color from '@/views/settings/Color.vue'
 import Cost from '@/views/settings/Cost.vue'
 import Item from '@/views/settings/Item.vue'
 import Outlet from '@/views/settings/Outlet.vue'
+
+//account
+import Account from '@/views/settings/Account.vue'
 // router, routes, auth guard
 Vue.use(Router)
 
@@ -84,6 +87,11 @@ const routes = [ //
           }
         ]
       },
+      {
+        path: '/account',
+        name: 'account',
+        component: Account
+      }
     ]
   },
   {
