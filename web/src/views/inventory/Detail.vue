@@ -2,7 +2,7 @@
     <div>
         <v-toolbar color="grey lighten-4"
                    flat
-                   prominent
+                   :dense="$vuetify.breakpoint.mdAndDown"
                    extended>
             <v-btn icon
                    class="hidden-md-and-up"
@@ -10,8 +10,10 @@
                 <v-icon>keyboard_backspace</v-icon>
             </v-btn>
             <v-toolbar-title>{{ title }}</v-toolbar-title>
+            <datepicker iconButton></datepicker>
             <v-spacer></v-spacer>
             <v-tabs slot="extension"
+                    :height="$vuetify.breakpoint.mdAndDown? 36: 48"
                     centered
                     v-model="tabs"
                     slider-color="black"
@@ -68,13 +70,12 @@
                                 sm8
                                 md4
                                 class="text-xs-center pa-3">
-                            <v-icon class="display-4"
-                                    color="blue-grey lighten-4">playlist_add</v-icon>
+                            <v-icon color="blue-grey lighten-4"
+                                    style="font-size: 100px;">tab</v-icon>
                             <div class="headline grey--text">Nothing here yet</div>
                             <div class="body-1 grey--text">Click to add some item</div>
                         </v-flex>
                     </v-layout>
-
                 </template>
                 <v-alert slot="no-results"
                          :value="true"
@@ -226,8 +227,12 @@
 
 <script>
 import validator from '@/mixins/validator'
+import datepicker from '@/components/datepicker'
 export default {
     mixins: [validator],
+    components: {
+        datepicker
+    },
     data() {
         return {
             title: null,

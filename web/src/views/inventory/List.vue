@@ -8,6 +8,7 @@
                 <v-toolbar color="grey lighten-4"
                            flat
                            prominent
+                           :dense="$vuetify.breakpoint.mdAndDown"
                            extended>
                     <v-spacer></v-spacer>
                     <v-btn icon
@@ -19,8 +20,7 @@
                                       prepend-icon="search"
                                       label="search"
                                       solo-inverted
-                                      flat
-                                      class="mx-3"></v-text-field>
+                                      flat></v-text-field>
                     </template>
                 </v-toolbar>
                 <v-divider></v-divider>
@@ -115,6 +115,9 @@ export default {
         currentId() {
             return this.$route.params.id || ''
         },
+        isInventoryListPage() {
+            return this.$route.name == 'inventory.list'
+        },
         filteredItems() {
             let vm = this
             if (!vm.searchKey) {
@@ -132,10 +135,7 @@ export default {
             return this.$store.getters.currentViewportSize
         },
         isDualColomnLayout() {
-            if (this.currentViewportSize == 'xs' || this.currentViewportSize == 'sm') {
-                return false
-            }
-            return true
+            return !this.$vuetify.breakpoint.smAndDown
         },
         active: {
             get() {
@@ -150,15 +150,22 @@ export default {
             }
         },
         sideMenuClasses() {
+            if (this.$vuetify.breakpoint.smAndDown) {
+                return { xs12: this.isInventoryListPage }
+            }
+
             return {
-                sm12: this.$route.name == 'inventory.list',
-                sm3: this.$route.name !== 'inventory.list'
+                xs12: this.isInventoryListPage,
+                xs3: !this.isInventoryListPage
             }
         },
         contentClasses() {
+            if (this.$vuetify.breakpoint.smAndDown) {
+                return { xs12: !this.isInventoryListPage }
+            }
             return {
-                xs0: this.$route.name == 'inventory.list',
-                sm9: this.$route.name !== 'inventory.list'
+                xs0: this.isInventoryListPage,
+                xs9: !this.isInventoryListPage
             }
         },
         title() {
