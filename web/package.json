@@ -19,7 +19,7 @@
     "vue-momentjs": "^0.1.1",
     "vue-router": "^3.0.1",
     "vue-swatches": "^1.0.1",
-    "vuetify": "^1.1.8",
+    "vuetify": "^1.1.13",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
@@ -42,6 +42,8 @@
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
     "http-proxy-middleware": "^0.17.4",
+    "material-design-icons": "^3.0.1",
+    "material-design-icons-iconfont": "^3.0.3",
     "node-sass": "^4.9.0",
     "opn": "^5.1.0",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
