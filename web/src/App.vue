@@ -15,9 +15,6 @@ export default {
         Toast
     },
     computed: {
-        currentViewportSize() {
-            return this.$store.getters.currentViewportSize
-        },
         appClasses() {
             return {
                 inner_body: true,
@@ -27,14 +24,8 @@ export default {
             }
         }
     },
-    methods: {
-        onResize() {
-            this.$store.dispatch('setViewportSize', window.innerWidth)
-        }
-    },
     mounted() {
         this.onResize()
-        console.log()
     }
 }
 </script>
