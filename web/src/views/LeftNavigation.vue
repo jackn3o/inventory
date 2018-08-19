@@ -1,12 +1,12 @@
 <template>
     <v-navigation-drawer dark
                          permenant
+                         stateless
                          absolute
-                         dense
                          hide-overlay
-                         :mini-variant="mini"
+                         :mini-variant="true"
                          :mini-variant-width="60"
-                         v-model="drawer"
+                         v-model="value"
                          class="navigation_drawer"
                          style="display: flex; flex-direction: column; z-index: 5; padding-bottom: 0;">
         <v-list class="pt-0">
@@ -70,10 +70,14 @@
 
 <script>
 export default {
+    props: {
+        value: {
+            type: Boolean,
+            default: true
+        }
+    },
     data() {
         return {
-            mini: true,
-            drawer: true
         }
     }
 }
