@@ -1,7 +1,6 @@
 <template>
     <v-app v-resize="onResize">
-        <div class="inner_body"
-             :class="appClasses">
+        <div :class="appClasses">
             <router-view></router-view>
         </div>
         <toast></toast>
@@ -21,7 +20,10 @@ export default {
         },
         appClasses() {
             return {
-                'py-3': this.currentViewportSize === 'xl'
+                inner_body: true,
+                'py-3': this.$vuetify.breakpoint.xlOnly,
+                mobile: this.$vuetify.breakpoint.smAndDown,
+                tablet: this.$vuetify.breakpoint.lgAndDown
             }
         }
     },
@@ -32,6 +34,7 @@ export default {
     },
     mounted() {
         this.onResize()
+        console.log()
     }
 }
 </script>
@@ -85,5 +88,10 @@ html .application {
     -webkit-transform: translateX(-150px);
     transform: translateX(-150px);
 }
+/*
+.application--wrap .inner_body.tablet  {
+    
+}
+*/
 </style>
 
