@@ -1,5 +1,5 @@
 <template>
-    <v-app v-resize="onResize">
+    <v-app>
         <div :class="appClasses">
             <router-view></router-view>
         </div>
@@ -24,9 +24,7 @@ export default {
             }
         }
     },
-    mounted() {
-        this.onResize()
-    }
+    mounted() {}
 }
 </script>
 <style>

@@ -12,7 +12,7 @@
         <v-btn v-if="iconButton"
                slot="activator"
                icon
-               class="btnClass">
+               :class="btnClass">
             <v-icon>{{ icon }}</v-icon>
         </v-btn>
         <v-text-field v-else
@@ -34,7 +34,7 @@ export default {
     props: {
         value: {},
         iconButton: { type: Boolean, default: false },
-        btnClass: { type: Object, default: {} },
+        btnClass: { type: Object, default: () => {} },
         label: { type: String, default: 'Date' },
         icon: { type: String, default: 'event' },
         textReadOnly: { type: Boolean, default: true },
