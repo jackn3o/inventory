@@ -96,167 +96,31 @@
                 <v-icon>add</v-icon>
             </v-btn>
         </v-fab-transition>
-        <v-dialog v-model="dialog"
-                  max-width="600px">
-            <v-card class="pa-3"
-                    v-if="dialog">
-                <v-card-title class="title">
-                    <v-layout row
-                              wrap>
-                        Inventory Adjustment
-                    </v-layout>
-                </v-card-title>
-                <v-card-text class="grey lighten-4"
-                             style="border-radius:12px;">
-                    <v-radio-group v-model="inOrOut"
-                                   row
-                                   hide-details
-                                   class="pt-0">
-                        <v-radio label="In"
-                                 value="in"></v-radio>
-                        <v-radio label="Out"
-                                 value="out"></v-radio>
-                    </v-radio-group>
-                </v-card-text>
-                <v-card-text>
-                    <v-layout row
-                              wrap>
-                        <v-flex xs12
-                                md6
-                                class="pr-3">
-                            <v-menu ref="datepicker"
-                                    lazy
-                                    :close-on-content-click="false"
-                                    v-model="datepicker"
-                                    transition="scale-transition"
-                                    offset-y
-                                    full-width
-                                    :nudge-right="40"
-                                    min-width="290px"
-                                    :return-value.sync="date">
-                                <v-text-field slot="activator"
-                                              label="Date"
-                                              placeholder="Select Date"
-                                              v-model="formattedDate"
-                                              prepend-icon="event"
-                                              readonly></v-text-field>
-                                <v-date-picker v-model="model.date"
-                                               year-icon="mdi-calendar-blank"
-                                               @input="$refs.datepicker.save($date)"></v-date-picker>
-
-                            </v-menu>
-                        </v-flex>
-                        <v-flex xs12
-                                md6
-                                class="pl-3">
-                            <v-select v-model="model.outletId"
-                                      label="Outlet"
-                                      placeholder="Please select"
-                                      autocomplete
-                                      :items="outlets"
-                                      item-value="_id"
-                                      item-text="description"></v-select>
-                        </v-flex>
-                        <v-flex xs12
-                                md6
-                                class="pr-3">
-                            <v-text-field v-model="model.documentNo"
-                                          label="Document Number"
-                                          placeholder="Document number"></v-text-field>
-
-                        </v-flex>
-                        <v-flex xs12
-                                md6
-                                class="pl-3">
-                            <v-text-field v-show="inOrOut == 'in'"
-                                          v-model="model.batchNo"
-                                          label="Batch Number"
-                                          placeholder="Batch number"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12
-                                md6
-                                class="pr-3">
-                            <v-text-field v-if="inOrOut == 'in'"
-                                          v-model="model.in"
-                                          label="IN"
-                                          placeholder="In Stock"></v-text-field>
-                            <v-text-field v-if="inOrOut== 'out'"
-                                          v-model="model.out"
-                                          label="OUT"
-                                          placeholder="Out Stock"></v-text-field>
-                        </v-flex>
-
-                        <v-flex xs12
-                                md6
-                                class="pl-3">
-                            <v-text-field v-if="inOrOut == 'in'"
-                                          v-model="model.unitCost"
-                                          type="number"
-                                          label="Unit Cost"
-                                          placeholder="Cost per unit"
-                                          prefix="$"></v-text-field>
-                            <v-text-field v-if="inOrOut == 'out'"
-                                          v-model="model.sellingPrice"
-                                          type="number"
-                                          label="Selling Price"
-                                          placeholder="Price per unit"
-                                          prefix="$"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12>
-                            <v-text-field v-model="model.remark"
-                                          multi-line
-                                          label="Remark"
-                                          placeholder="Please describe"></v-text-field>
-                        </v-flex>
-                    </v-layout>
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary"
-                           flat
-                           @click.stop="dialog=false">Close</v-btn>
-                    <v-btn color="primary"
-                           flat
-                           @click.stop="addDetail">Save</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <in-or-out v-model="dialog"
+                   :id="currentId"
+                   :outlets="outlets"
+                   @close-dialog="closeDialog()"></in-or-out>
     </div>
 </template>
 
 <script>
-import validator from '@/mixins/validator'
 import datepicker from '@/components/datepicker'
+import InOrOut from './InOrOut.vue'
+
 export default {
-    mixins: [validator],
     components: {
-        datepicker
+        datepicker,
+        InOrOut
     },
     data() {
         return {
             title: null,
-            datepicker: false,
             tabs: '0',
             outlets: null,
             dialog: false,
-            inOrOut: 'in',
             search: null,
             details: [],
-            pagingSetting: [10, 20, 30, { text: 'All', value: -1 }],
-            model: {
-                documentNo: null,
-                batchNo: null,
-                outletId: null,
-                date: null,
-                unitCost: null,
-                utpTotalCost: null,
-                sellingPrice: null,
-                totalSales: null,
-                in: null,
-                out: null,
-                remark: null
-            }
+            pagingSetting: [10, 20, 30, { text: 'All', value: -1 }]
         }
     },
     computed: {
@@ -278,18 +142,8 @@ export default {
 
             return arr_header
         },
-        formattedDate() {
-            if (!this.model.date) {
-                return null
-            }
-
-            return this.$moment(this.model.date).format('DD/MMMM/YYYY')
-        },
-        currentViewportSize() {
-            return this.$store.getters.currentViewportSize
-        },
         isDualColomnLayout() {
-            if (this.currentViewportSize == 'xs' || this.currentViewportSize == 'sm') {
+            if (this.$vuetify.breakpoint.smAndDown) {
                 return false
             }
             return true
@@ -299,8 +153,9 @@ export default {
         }
     },
     methods: {
-        changeTab() {
-            console.log(this.tabs)
+        changeTab() {},
+        closeDialog() {
+            this.dialog = false
         },
         to2Decimal(value) {
             return parseFloat(value).toFixed(2) || '0.00'
@@ -339,25 +194,8 @@ export default {
                 })
                 .catch(obj_exception => {})
         },
-        addDetail() {
-            let vm = this
-            vm.model.date = vm.$moment(vm.model.date)
-            vm.model.out = -Math.abs(vm.model.out)
-            vm.model.sellingPrice = -Math.abs(vm.model.sellingPrice)
-            vm
-                .post(`/items/${vm.currentId}/details`, vm.model)
-                .then(obj_response => {
-                    if (!obj_response || !obj_response.data) {
-                        return
-                    }
-
-                    vm.dialog = false
-                })
-                .catch(obj_exception => {})
-        },
         load() {
             let vm = this
-
             vm.axios
                 .get('/settings/outlets')
                 .then(obj_response => {
@@ -370,7 +208,7 @@ export default {
     },
     watch: {
         currentId() {
-            this.getCurrentItem()
+            this.load()
         }
     },
     mounted() {
