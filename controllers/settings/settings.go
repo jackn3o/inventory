@@ -29,4 +29,5 @@ const (
 	CategorySettingCollection = "settings.categories"
 	ColorSettingCollection    = "settings.colors"
 	OutletSettingCollection   = "settings.outlets"
+	LockSettingCollection     = "settings.lock"
 )
