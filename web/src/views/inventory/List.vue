@@ -78,8 +78,8 @@
             <transition name="slide-x-transition"
                         enter-class="slide-x150-transition-enter"
                         leave-to-class="slide-x150-transition-leave-to">
-                <add-inventory v-if="isAddNew"
-                               @close="close()"></add-inventory>
+                <new-inventory v-if="isAddNew"
+                               @close="close()"></new-inventory>
             </transition>
         </v-flex>
         <v-flex :class="contentClasses">
@@ -94,11 +94,11 @@
 
 <script>
 import commonMethods from '@/mixins/common_methods.js'
-import AddInventory from './Add.vue'
+import NewInventory from './New.vue'
 
 export default {
     components: {
-        AddInventory
+        NewInventory
     },
     mixins: [commonMethods],
     data() {
