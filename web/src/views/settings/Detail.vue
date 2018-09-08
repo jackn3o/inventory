@@ -53,7 +53,7 @@ export default {
         isShowSearch() {
             switch (this.currentRouteName) {
                 case 'settings':
-                case 'settings.cost':
+                case 'settings.application':
                 case 'settings.empty':
                     return false
                 default:
@@ -66,5 +66,4 @@ export default {
 </script>
 
 <style>
-
 </style>

@@ -60,14 +60,14 @@ export default {
                     to: 'settings.color'
                 },
                 {
-                    icon: 'attach_money',
-                    title: 'Cost',
-                    to: 'settings.cost'
-                },
-                {
                     icon: 'business',
                     title: 'Outlet',
                     to: 'settings.outlet'
+                },
+                {
+                    icon: 'public',
+                    title: 'Application',
+                    to: 'settings.application'
                 }
             ],
             isShow2ndLevel: false // for computed,
@@ -115,5 +115,4 @@ export default {
 </script>
 
 <style>
-
 </style>
