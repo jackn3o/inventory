@@ -26,5 +26,9 @@ func New(store *connector.Store, config configuration.Config) *Controller {
 
 // Key for collection
 const (
-	ItemsCollection = "items" // main setting
+	ItemsCollection       = "items"         // main setting
+	ItemsDetailCollection = "items.details" // item details
+	ItemsInCollection     = "items.in"      // Inventory Batch
+	ItemsOutCollection    = "items.out"
+	ItemsDetailViews      = "items.details.view"
 )
