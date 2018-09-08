@@ -12,10 +12,9 @@ import InventoryDetail from '@/views//inventory/Detail'
 import SettingList from '@/views/settings/List.vue'
 import Category from '@/views/settings/Category.vue'
 import Color from '@/views/settings/Color.vue'
-import Cost from '@/views/settings/Cost.vue'
 import Item from '@/views/settings/Item.vue'
 import Outlet from '@/views/settings/Outlet.vue'
-
+import Application from '@/views/settings/Application.vue'
 //account
 import Account from '@/views/settings/Account.vue'
 // router, routes, auth guard
@@ -62,14 +61,6 @@ const routes = [ //
             component: Color
           },
           {
-            path: '/settings/cost',
-            name: 'settings.cost',
-            meta: {
-              title: 'Cost'
-            },
-            component: Cost
-          },
-          {
             path: '/settings/item',
             name: 'settings.item',
             meta: {
@@ -84,7 +75,15 @@ const routes = [ //
               title: 'Outlet'
             },
             component: Outlet
-          }
+          },
+          {
+            path: '/settings/application',
+            name: 'settings.application',
+            meta: {
+              title: 'Application'
+            },
+            component: Application
+          },
         ]
       },
       {
